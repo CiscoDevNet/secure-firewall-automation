@@ -1,0 +1,140 @@
+- name: "Deploy Secure Firewall in AWS"
+  hosts: localhost
+  gather_facts: no
+  vars:
+    env_name: "Cisco"
+    ansible_ssh_private_key_name: "{{ env_name }}-keypair"
+
+  tasks:
+    # Delete FMCv Instance
+    - name: Get FMCv Instance
+      ec2_instance_info:
+        filters:
+          "tag:Name": "{{ env_name}}_FMCv"
+      register: fmc_info
+
+    - name: Debug Instance Info
+      debug:
+        var: fmc_info.instances
+
+    - name: Terminate FMCv Instance
+      ec2_instance:
+        instance_ids: "{{ fmc_info.instances[0].instance_id }}"
+        state: absent
+      when: fmc_info.instances | length > 0
+
+    # Delete FTDv Instance
+    - name: Get FTDv Instance
+      ec2_instance_info:
+        filters:
+          "tag:Name": "{{ env_name}}_FTDv"
+      register: ftd_info
+
+    - name: Debug Instance Info
+      debug:
+        var: ftd_info.instances
+
+    - name: Terminate FTDv Instance
+      ec2_instance:
+        instance_ids: "{{ ftd_info.instances[0].instance_id }}"
+        state: absent
+      when: ftd_info.instances | length > 0
+
+    # Delete Security Group
+    - name: Get Security Groups
+      ec2_group_info:
+        filters:
+          "tag:Name": "{{ env_name }}*"
+      register: sg_info
+
+    - name: Debug Security Groups Info
+      debug:
+        var: sg_info
+
+    - name: Terminate Security Groups
+      ec2_group:
+        group_id: "{{ sg_info.security_groups[0].group_id }}"
+        vpc_id: "{{ sg_info.security_groups[0].vpc_id }}"
+        state: absent
+      when: sg_info.security_groups | length > 0
+
+    # Delete Subnets
+    - name: Get Subnets
+      ec2_vpc_subnet_info:
+        filters:
+          "tag:Name": "{{ env_name }}*"
+      register: subnet_info
+
+    - name: Debug Subnet Info
+      debug:
+        var: subnet_info
+
+    - name: Terminate Subnets
+      ec2_vpc_subnet:
+        cidr: "{{ item.cidr_block }}"
+        vpc_id: "{{ item.vpc_id }}"
+        state: absent
+      loop: "{{ subnet_info.subnets }}"
+      when: subnet_info.subnets | length > 0
+
+    # Delete IGW
+    - name: Get IGW Info
+      ec2_vpc_igw_info:
+        filters:
+          "tag:Name": "{{ env_name }}*"
+      register: igw_info
+
+    - name: Debug IGW Info
+      debug:
+        var: igw_info
+
+    - name: Terminate IGW
+      ec2_vpc_igw:
+        vpc_id: "{{ igw_info.internet_gateways[0].attachments[0].vpc_id }}"
+        state: absent
+      when: igw_info.internet_gateways | length > 0
+
+    # Delete Route Tables
+    - name: Get Route Tables
+      ec2_vpc_route_table_info:
+        filters:
+          "tag:Name": "{{ env_name }}*"
+      register: route_info
+
+    - name: Debug route Info
+      debug:
+        var: route_info
+
+    - name: Terminate Route Tables
+      ec2_vpc_route_table:
+        route_table_id: "{{ item.route_table_id }}"
+        vpc_id: "{{ item.vpc_id }}"
+        routes: "{{ item.routes }}"
+        purge_routes: true
+        purge_subnets: true
+        state: absent
+      loop: "{{ route_info.route_tables }}"
+      when: route_info.route_tables | length > 0
+
+    # Delete VPC
+    - name: Get VPC Info
+      ec2_vpc_net_info:
+        filters:
+          "tag:Name": "{{ env_name }}*"
+      register: vpc_info
+
+    - name: Debug VPC Info
+      debug:
+        var: vpc_info
+    - name: Terminate VPC
+      ec2_vpc_net:
+        vpc_id: "{{ vpc_info.vpcs[0].vpc_id }}"
+        state: absent
+      when: vpc_info.vpcs | length > 0
+
+    # Delete Key Pair
+    - name: Terminate Key Pair
+      ec2_key:
+        name: "{{ ansible_ssh_private_key_name }}"
+        state: absent
+

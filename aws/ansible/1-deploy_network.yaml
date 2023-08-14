@@ -1,0 +1,278 @@
+- name: "Deploy Secure Firewall in AWS"
+  hosts: localhost
+  gather_facts: no
+  vars:
+    env_name: "Cisco"
+    ansible_ssh_private_key_name: "{{ env_name }}-keypair"
+  tasks:
+
+  ## Key Pair ##
+    # Key Pair for SSH
+    - name: "Create production key pair"
+      ec2_key:
+        name: "{{ ansible_ssh_private_key_name }}"
+        state: present
+      register: production_keypair
+    - name: "Save production private key"
+      copy:
+        content: "{{ production_keypair.key.private_key }}"
+        dest: "{{ ansible_ssh_private_key_name }}"
+        mode: 0600
+        #state: "{{ 'present' if provision_resources else 'absent' }}"
+      when: production_keypair.changed
+
+  ## VPC ##
+    # VPC
+    - name: "Create a VPC"
+      ec2_vpc_net:
+        name: "{{ env_name }} VPC"
+        state: present
+        cidr_block: 172.16.0.0/16
+      register: prod_vpc
+    # Subnets
+    - name: "Create Mgmt Subnet"
+      ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ prod_vpc.vpc.id }}"
+        cidr: 172.16.0.0/24
+        tags:
+          Name: "{{ env_name}} Mgmt Subnet"
+      register: mgmt_subnet
+    - name: "Create Diag Subnet"
+      ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ prod_vpc.vpc.id }}"
+        cidr: 172.16.1.0/24
+        tags:
+          Name: "{{ env_name}} Diag Subnet"
+      register: diag_subnet
+    - name: "Create Outside Subnet"
+      ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ prod_vpc.vpc.id }}"
+        cidr: 172.16.2.0/24
+        tags:
+          Name: "{{ env_name}} Outside Subnet"
+      register: outside_subnet
+    - name: "Create Inside Subnet"
+      ec2_vpc_subnet:
+        state: present
+        vpc_id: "{{ prod_vpc.vpc.id }}"
+        cidr: 172.16.3.0/24
+        tags:
+          Name: "{{ env_name}} Inside Subnet"
+      register: inside_subnet
+
+  ## Security Group ##
+    - name: "Create a Security group"
+      ec2_group:
+        name: "Allow All"
+        description: "Allow all traffic"
+        vpc_id: "{{ prod_vpc.vpc.id }}"
+        state: present
+        rules:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+        tags:
+          Name: "{{ env_name}} SG"
+      register: prod_vpc_security_group
+
+  ## Interfaces ##
+    # FTD Interfaces
+    - name: "Create FTDv Mgmt Interface"
+      ec2_eni:
+        subnet_id: "{{ mgmt_subnet.subnet.id }}"
+        description: "Management interface"
+        private_ip_address: "172.16.0.10"
+        security_groups: "{{ prod_vpc_security_group.group_name }}"
+        delete_on_termination: yes
+        state: present
+        tags:
+          Name: "{{ env_name}} FTD Mgmt"
+      register: eth0
+    - name: "Create FTDv Diag Interface"
+      ec2_eni:
+        subnet_id: "{{ diag_subnet.subnet.id }}"
+        description: "Diag interface"
+        private_ip_address: "172.16.1.10"
+        delete_on_termination: yes
+        state: present
+        tags:
+          Name: "{{ env_name}} FTD Diag"
+      register: eth1
+    - name: "Create FTDv Outside Interface"
+      ec2_eni:
+        subnet_id: "{{ outside_subnet.subnet.id }}"
+        delete_on_termination: yes
+        description: "Outside interface"
+        private_ip_address: "172.16.2.10"
+        state: present
+        tags:
+          Name: "{{ env_name}} FTD Outside"
+      register: eth2
+    - name: "Create FTDv Inside Interface"
+      ec2_eni:
+        subnet_id: "{{ inside_subnet.subnet.id }}"
+        delete_on_termination: yes
+        description: "Inside interface"
+        private_ip_address: "172.16.3.10"
+        state: present
+        tags:
+          Name: "{{ env_name}} FTD Inside"
+      register: eth3
+    # FMCv Mgmt Interface
+    - name: "Create FMCv Interface"
+      ec2_eni:
+        subnet_id: "{{ mgmt_subnet.subnet.id }}"
+        description: "Management interface"
+        private_ip_address: "172.16.0.50"
+        security_groups: "{{ prod_vpc_security_group.group_name }}"
+        delete_on_termination: yes
+        state: present
+        tags:
+          Name: "{{ env_name}} FTD Mgmt"
+      register: fmc_int
+  ## Routing ##
+    # Internet Gateway
+    - name: "Create an Internet Gateway"
+      ec2_vpc_igw:
+        vpc_id: "{{ prod_vpc.vpc.id }}"
+        state: present
+        tags:
+          Name: "{{ env_name}} IGW"
+      register: prod_vpc_igw
+    # Outside Route Table
+    - name: "Create Outside Route table"
+      ec2_vpc_route_table:
+        vpc_id: "{{ prod_vpc.vpc.id }}"
+        subnets:
+          - "{{ outside_subnet.subnet.id }}"
+          - "{{ mgmt_subnet.subnet.id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ prod_vpc_igw.gateway_id }}"
+        state: present
+        tags:
+          Name: "{{ env_name}} Outside RT"
+      register: outside_route_table
+    # Inside Route Table
+    - name: "Create Inside Route table"
+      ec2_vpc_route_table:
+        vpc_id: "{{ prod_vpc.vpc.id }}"
+        subnets:
+          - "{{ inside_subnet.subnet.id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            network_interface_id: "{{ eth3.interface.id }}"
+        state: present
+        tags:
+          Name: "{{ env_name}} Inside RT"
+      register: inside_route_table
+
+  ## EC2 Instances
+    # FTD AMI
+    - name: Get FTD AMI
+      ec2_ami_info:
+        filters:
+          "name": "ftdv-7.3*"
+      register: ftd_ami
+    - debug:
+        var: ftd_ami
+    # FTDv Instance
+    - name: "Create FTDv Instance"
+      ec2_instance:
+        key_name: "{{ ansible_ssh_private_key_name }}"
+        instance_type: c5.xlarge
+        image_id: "{{ ftd_ami.images.0.image_id }}"
+        state: present
+        instance_initiated_shutdown_behavior: terminate
+        network:
+          interfaces:
+            - id: "{{ eth0.interface.id }}"
+            - id: "{{ eth1.interface.id }}"
+            - id: "{{ eth2.interface.id }}"
+            - id: "{{ eth3.interface.id }}"
+        user_data: |
+                   {
+                   "AdminPassword":"123Cisco@123!",
+                   "Hostname":"FTDv",
+                   "ManageLocally":"No",
+                   "FmcIp":"172.16.0.50",
+                   "FmcRegKey":"cisco",
+                   "FmcNatId":"abc123"
+                   }
+        tags:
+          Name: "{{ env_name}}_FTDv"
+    # FTDv Mgmt Elastic IP address
+    - name: "Associate an elastic IP with an instance"
+      ec2_eip:
+        device_id: "{{ eth0.interface.id }}"
+        release_on_disassociation: true
+        in_vpc: true
+        state: present
+      register: ftd_manamgenet_ip
+    # FMC AMI
+    - name: Get FMC AMI
+      ec2_ami_info:
+        filters:
+          "name": "fmcv-7.3*"
+      register: fmc_ami
+    # FMCv Instance
+    - name: "Create FMCv Instance"
+      ec2_instance:
+        key_name: "{{ ansible_ssh_private_key_name }}"
+        instance_type: c5.4xlarge
+        image_id: "{{ fmc_ami.images.0.image_id }}"
+        state: present
+        instance_initiated_shutdown_behavior: terminate
+        network:
+          interfaces:
+            - id: "{{ fmc_int.interface.id }}"
+        user_data: |
+                   #Sensor
+                   {
+                   "AdminPassword":"123Cisco@123!",
+                   "Hostname":"{{ env_name }}_FMCv"
+                   }
+        tags:
+          Name: "{{ env_name}}_FMCv"
+      register: fmc
+    # FMCv Mgmt Elastic IP address
+    - name: "Associate an elastic IP with an instance"
+      ec2_eip:
+        device_id: "{{ fmc_int.interface.id }}"
+        release_on_disassociation: true
+        in_vpc: true
+        state: present
+      register: fmc_mgmt_ip
+    - debug:
+        var: fmc_mgmt_ip
+
+    # Hosts file
+    - name: "Create lab_info.txt file"
+      copy:
+        content: |
+          ---
+          all:
+            hosts:
+              fmc:
+                ansible_host: {{ fmc_mgmt_ip.public_ip }}
+                ansible_network_os: cisco.fmcansible.fmc
+                ansible_user: admin
+                ansible_password: 123Cisco@123!
+                ansible_httpapi_port: 443
+                ansible_httpapi_use_ssl: True
+                ansible_httpapi_validate_certs: False
+                ftd_mgmt_ip: 172.16.0.10
+                ftd_reg_key: cisco123
+                ftd_nat_id: abc123
+                auth_string: "admin:123Cisco@123!"
+        dest: "./hosts.yaml"
+
+    # Lab Info
+    - name: "Create host.yaml file"
+      copy:
+        content: |
+          FMC URL  = https://{{ fmc_mgmt_ip.public_ip }}
+          FTD SSH  = ssh -i "{{ ansible_ssh_private_key_name }}" admin@{{ ftd_manamgenet_ip.public_ip }}
+        dest: "./lab_info.txt"

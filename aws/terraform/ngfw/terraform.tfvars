@@ -1,0 +1,27 @@
+#########################
+# Variable Assignments
+#########################
+
+
+# To deploy an FMCv in the mgmt subnet set "create_fmcv" to true. If using cdFMC in CDO set value to false.
+# This value must be set!
+create_fmcv   = true
+
+# Enter FMC Password if "create_fmcv" is set to true.
+fmc_pass      = ""
+
+# Enter cdFMC FQDN if "create_fmcv" is set to false.
+cdFMC         = ""
+
+# Enter CDO Token if "create_fmcv" is set to false.
+cdo_token     = ""
+
+# Enter the CDO region of your CDO SaaS instance (us, eu, apj).
+cdo_region    = "us"
+
+# Enter FMC Public IP from Network Output if using FMCv. If using cdFMC leave empty "".
+fmc_public_ip = ""
+
+# Enter the FTD Public IP address from the Network Output.
+ftd_public_ip = ""
+
