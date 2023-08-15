@@ -41,7 +41,7 @@ resource "fmc_ips_policies" "ips_policy" {
 #########################################################
 
 resource "fmc_access_rules" "access_rule_1" {
-    depends_on = [fmc_devices.ftd]
+    depends_on = [fmc_access_policies.access_policy]
     acp                = fmc_access_policies.access_policy.id
     section            = "mandatory"
     name               = "Permit Outbound"
@@ -72,7 +72,7 @@ resource "fmc_access_rules" "access_rule_1" {
 }
 
 resource "fmc_access_rules" "access_rule_2" {
-    depends_on = [fmc_devices.ftd]
+    depends_on = [fmc_access_policies.access_policy]
     acp                = fmc_access_policies.access_policy.id
     section            = "mandatory"
     name               = "Access to App Server"
@@ -96,15 +96,4 @@ resource "fmc_access_rules" "access_rule_2" {
     }
     ips_policy   = fmc_ips_policies.ips_policy.id
     new_comments = ["SSH to App Server"]
-}
-
-# Deploy policy if any changes exist
-resource "fmc_ftd_deploy" "ftd" {
-    depends_on = [
-        fmc_access_rules.access_rule_1,
-        fmc_access_rules.access_rule_2
-    ]
-    device = fmc_devices.ftd.id
-    ignore_warning = false
-    force_deploy = false
 }
