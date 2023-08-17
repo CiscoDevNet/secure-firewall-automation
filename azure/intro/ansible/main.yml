@@ -1,0 +1,14 @@
+- hosts: all
+  tasks:
+    - name: Create a virtual network
+      azure_rm_virtualnetwork:
+        resource_group: yourResourceGroupName
+        name: myVirtualNetwork
+        address_prefixes_cidr:
+          - "10.1.0.0/16"
+
+    # - name: Delete a virtual network
+    #   azure_rm_virtualnetwork:
+    #     resource_group: yourResourceGroupName
+    #     name: myVirtualNetwork
+    #     state: absent
