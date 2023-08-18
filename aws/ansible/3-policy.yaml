@@ -168,8 +168,6 @@
         path_params:
           domainUUID: '{{ domain[0].uuid }}'
         register_as: web_server_ext
-    - debug:
-        var: web_server_ext
 
     # Port Objects
     - name: HTTP 8080

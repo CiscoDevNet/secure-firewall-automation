@@ -40,6 +40,25 @@
         state: absent
       when: ftd_info.instances | length > 0
 
+    # Delete Interfaces
+    - name: Get Interface
+      ec2_eni_info:
+        filters:
+          "tag:Name": "{{ env_name }}*"
+      register: int_info
+
+    - name: Debug Interface Info
+      debug:
+        var: int_info
+
+    - name: Terminate Interfaces
+      ec2_eni:
+        eni_id: "{{ item.network_interface_id }}"
+        force_detach: true
+        state: absent
+      loop: "{{ int_info.network_interfaces }}"
+      when: int_info.network_interfaces | length > 0
+
     # Delete Security Group
     - name: Get Security Groups
       ec2_group_info:
@@ -109,9 +128,7 @@
       ec2_vpc_route_table:
         route_table_id: "{{ item.route_table_id }}"
         vpc_id: "{{ item.vpc_id }}"
-        routes: "{{ item.routes }}"
-        purge_routes: true
-        purge_subnets: true
+        lookup: id
         state: absent
       loop: "{{ route_info.route_tables }}"
       when: route_info.route_tables | length > 0

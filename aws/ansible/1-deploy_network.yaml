@@ -176,8 +176,6 @@
         filters:
           "name": "ftdv-7.3*"
       register: ftd_ami
-    - debug:
-        var: ftd_ami
     # FTDv Instance
     - name: "Create FTDv Instance"
       ec2_instance:
