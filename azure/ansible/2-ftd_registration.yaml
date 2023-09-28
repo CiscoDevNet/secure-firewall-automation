@@ -1,0 +1,53 @@
+- hosts: fmc
+  connection: httpapi
+  gather_facts: False
+  tasks:
+    # License
+    - name: Enable Eval License
+      cisco.fmcansible.fmc_configuration:
+        operation: createSmartLicense
+        data:
+          type: SmartLicense
+          registrationType: EVALUATION
+        register_as: license
+      ignore_errors: yes
+    - name: Get Domain
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDomain
+        register_as: domain
+    # Access Policy
+    - name: Create Access Policy
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertAccessPolicy
+        data:
+          name: FTDv-Access-Policy
+          defaultAction:
+            action: BLOCK
+            type: defaultAction
+          type: AccessPolicy
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: accesspolicy
+    # Register FTDv to FMCv
+    - name: device onboarding
+      cisco.fmcansible.fmc_configuration:
+        operation: createMultipleDevice
+        data:
+          hostName: 172.16.0.10
+          license_caps:
+            - 'BASE'
+            - 'MALWARE'
+            - 'URLFilter'
+            - 'THREAT'
+          ftdMode: 'ROUTED'
+          type: Device
+          regKey: cisco
+          performanceTier: "FTDv20"
+          name: "FTDv"
+          accessPolicy:
+            id: '{{ accesspolicy.id }}'
+            type: 'AccessPolicy'
+          natID: abc123
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: ftd

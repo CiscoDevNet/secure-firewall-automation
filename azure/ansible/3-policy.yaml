@@ -1,0 +1,400 @@
+- hosts: fmc
+  connection: httpapi
+  gather_facts: False
+  tasks:
+    # Fetch Data from FMC
+    - name: Get Domain UUID
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDomain
+        register_as: domain
+    - name: Get Devices
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllDevice
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        filters:
+          name: FTDv
+        register_as: device_list
+      until: device_list is defined
+      retries: 60
+      delay: 5
+      when: device_list is not defined
+    - name: Get Physical Interfaces
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllFTDPhysicalInterface
+        path_params:
+          containerUUID: '{{ device_list[0].id }}'
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: physical_interfaces
+    - name: Get Port Object HTTP
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllProtocolPortObject
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        filters:
+          name: HTTP
+        register_as: http
+    - name: Get Port Object HTTPS
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllProtocolPortObject
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        filters:
+          name: HTTPS
+        register_as: https
+    - name: Get IPS Policy
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllIntrusionPolicy
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        filters:
+          name: Security Over Connectivity
+        register_as: ips_policy
+    - name: Get Access Policy
+      cisco.fmcansible.fmc_configuration:
+        operation: getAllAccessPolicy
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        filters:
+          name: FTDv-Access-Policy
+        register_as: accesspolicy
+
+    # Security Zones
+    - name: Internal Security Zone
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertSecurityZoneObject
+        data:
+          name: internal
+          interfaceMode: ROUTED
+          type: SecurityZone
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: int_zone
+    - name: Extnernal Security Zone
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertSecurityZoneObject
+        data:
+          name: external
+          interfaceMode: ROUTED
+          type: SecurityZone
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: ext_zone
+
+    # Interfaces
+    - name: Outside Interface
+      cisco.fmcansible.fmc_configuration:
+        operation: updateFTDPhysicalInterface
+        data:
+          ifname: outside
+          ipv4:
+            dhcp:
+              enableDefaultRouteDHCP: True
+              dhcpRouteMetric: 100
+          MTU: 1500
+          enabled: True
+          mode: NONE
+          type: PhysicalInterface
+          name: TenGigabitEthernet0/0
+          securityZone:
+            id: '{{ ext_zone.id }}'
+            type: SecurityZone
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+          containerUUID: '{{ device_list[0].id }}'
+          objectId: '{{ physical_interfaces[1].id }}'
+    - name: Inside Interface
+      cisco.fmcansible.fmc_configuration:
+        operation: updateFTDPhysicalInterface
+        data:
+          ifname: inside
+          ipv4:
+            dhcp:
+              enableDefaultRouteDHCP: True
+              dhcpRouteMetric: 100
+          MTU: 1500
+          enabled: True
+          mode: NONE
+          type: PhysicalInterface
+          name: TenGigabitEthernet0/1
+          securityZone:
+            id: '{{ int_zone.id }}'
+            type: SecurityZone
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+          containerUUID: '{{ device_list[0].id }}'
+          objectId: '{{ physical_interfaces[2].id }}'
+
+    # Network Objects
+    - name: Internal Network
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertNetworkObject
+        data:
+          name: inside_subnet
+          value: 172.16.3.0/24
+          type: Network
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: int_net
+    - name: External Network
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertNetworkObject
+        data:
+          name: outside_subnet
+          value: 172.16.2.0/24
+          type: Network
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: ext_net
+
+    # Host Objects
+    - name: Web Server
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertHostObject
+        data:
+          name: web_server_int
+          value: 172.16.3.50
+          type: Host
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: web_server_int
+    - name: Web Server Ext
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertHostObject
+        data:
+          name: web_server_ext
+          value: 172.16.2.50
+          type: Host
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: web_server_ext
+
+    # Port Objects
+    - name: HTTP 8080
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertProtocolPortObject
+        data:
+          name: HTTP_8080
+          port: "8080"
+          protocol: "TCP"
+          type: protocolportobject
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: HTTP_8080
+
+    # URL Objects
+    - name: Cisco URL
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertURLObject
+        data:
+          name: cisco_url
+          url: https://www.cisco.com
+          type: Url
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: cisco_url
+
+    # FQDN Objects
+    - name: Cisco FQDN
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertFQDNObject
+        data:
+          name: cisco_fqdn
+          value: cisco.com
+          dnsResolution: IPV4_ONLY
+          type: FQDN
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: cisco_fqdn
+
+    # Access Control Policy
+
+    - name: Access Rule 1
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertAccessRule
+        data:
+          name: Permit Outbound
+          type: accessrule
+          action: ALLOW
+          section: mandatory
+          enabled: true
+          sendEventsToFMC: true
+          logBegin: true
+          logEnd: true
+          sourceZones:
+            objects:
+              - name: '{{ int_zone.name }}'
+                id: '{{ int_zone.id }}'
+                type: '{{ int_zone.type }}'
+          destinationZones:
+            objects:
+              - name: '{{ ext_zone.name }}'
+                id: '{{ ext_zone.id }}'
+                type: '{{ ext_zone.type }}'
+          sourceNetworks:
+            objects:
+              - id: '{{ int_net.id }}'
+                name: '{{ int_net.name }}'
+                type: '{{ int_net.type }}'
+          newComments:
+            - 'Outbound Traffic'
+        path_params:
+          section: 'Mandatory'
+          containerUUID: '{{ accesspolicy[0].id }}'
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: accessrule1
+    - name: Access Rule 2
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertAccessRule
+        data:
+          name: Access to Web Server
+          type: accessrule
+          action: ALLOW
+          section: mandatory
+          enabled: true
+          sendEventsToFMC: true
+          logBegin: true
+          logEnd: true
+          sourceZones:
+            objects:
+              - name: '{{ ext_zone.name }}'
+                id: '{{ ext_zone.id }}'
+                type: '{{ ext_zone.type }}'
+          destinationZones:
+            objects:
+              - name: '{{ int_zone.name }}'
+                id: '{{ int_zone.id }}'
+                type: '{{ int_zone.type }}'
+          destinationNetworks:
+            objects:
+              - id: '{{ web_server_int.id }}'
+                name: '{{ web_server_int.name }}'
+                type: '{{ web_server_int.type }}'
+          destinationPorts:
+            objects:
+              - id: '{{ HTTP_8080.id }}'
+                name: '{{ HTTP_8080.name }}'
+                type: '{{ HTTP_8080.type }}'
+          newComments:
+            - 'Web Server'
+        path_params:
+          section: 'Mandatory'
+          containerUUID: '{{ accesspolicy[0].id }}'
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: accessrule2
+
+    - name: Access Rule 3
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertAccessRule
+        data:
+          name: Access to Cisco
+          type: accessrule
+          action: ALLOW
+          section: mandatory
+          insertBefore: 1
+          enabled: true
+          sendEventsToFMC: true
+          logBegin: true
+          logEnd: true
+          sourceZones:
+            objects:
+              - name: '{{ int_zone.name }}'
+                id: '{{ int_zone.id }}'
+                type: '{{ int_zone.type }}'
+          destinationZones:
+            objects:
+              - name: '{{ ext_zone.name }}'
+                id: '{{ ext_zone.id }}'
+                type: '{{ ext_zone.type }}'
+          sourceNetworks:
+            objects:
+              - id: '{{ int_net.id }}'
+                name: '{{ int_net.name }}'
+                type: '{{ int_net.type }}'
+          destinationNetworks:
+            objects:
+              - id: '{{ cisco_fqdn.id }}'
+                name: '{{ cisco_fqdn.name }}'
+                type: '{{ cisco_fqdn.type }}'
+          destinationPorts:
+            objects:
+              - id: '{{ http[0].id }}'
+                name: '{{ http[0].name }}'
+                type: '{{ http[0].type }}'
+              - id: '{{ https[0].id }}'
+                name: '{{ https[0].name }}'
+                type: '{{ https[0].type }}'
+          urls:
+            objects:
+              - id: '{{ cisco_url.id }}'
+                name: '{{ cisco_url.name }}'
+                type: '{{ cisco_url.type }}'
+          ipsPolicy:
+              id: '{{ ips_policy[0].id }}'
+              name: '{{ ips_policy[0].name }}'
+              type: '{{ ips_policy[0].type }}'
+          newComments:
+            - 'cisco.com'
+        path_params:
+          section: 'Mandatory'
+          insertBefore: 1
+          containerUUID: '{{ accesspolicy[0].id }}'
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: accessrule3
+
+
+    # NAT Policies
+    - name: Create NAT Policy
+      cisco.fmcansible.fmc_configuration:
+        operation: upsertFTDNatPolicy
+        data:
+          name: FTDv NAT Policy
+          type: FTDNatPolicy
+        path_params:
+          domainUUID: '{{ domain[0].uuid }}'
+        register_as: nat_policy
+
+#    - name: Outbound Dynamic NAT
+#      cisco.fmcansible.fmc_configuration:
+#        operation: upsertFTDAutoNatRule
+#        data:
+#          natType: DYNAMIC
+#          sourceInterface: "{{ int_zone }}"
+#          destinationInterface: "{{ ext_zone }}"
+#          originalNetwork: "{{ int_net }}"
+#          interfaceInTranslatedSource: true
+#          dns: False
+#          enabled: True
+#          type: FTDAutoNatRule
+#        path_params:
+#          containerUUID: '{{ nat_policy.id }}'
+#          domainUUID: '{{ domain[0].uuid }}'
+#        register_as: outbound_nat
+#    - debug:
+#        var: outbound_nat
+#    - name: Web Server Static NAT
+#      cisco.fmcansible.fmc_configuration:
+#        operation: upsertFTDAutoNatRule
+#        data:
+#          natType: STATIC
+#          sourceInterface:
+#            id: "{{ int_zone.id }}"
+#            #name: "{{ int_zone.name }}"
+#            type: "{{ int_zone.type }}"
+#          destinationInterface:
+#            id: "{{ ext_zone.id }}"
+#            #name: "{{ ext_zone.name }}"
+#            type: "{{ ext_zone.type }}"
+#          originalNetwork: "{{ web_server_int }}"
+#          translatedNetwork: "{{ web_server_ext }}"
+#            #id: "{{ web_server_ext.id }}"
+#            #name: "{{ web_server_ext.name }}"
+#            #type: "{{ web_server_ext.type }}"
+#          #interfaceInTranslatedSource: false
+#          dns: False
+#          enabled: true
+#          type: FTDAutoNatRule
+#        path_params:
+#          containerUUID: '{{ nat_policy.id }}'
+#          domainUUID: '{{ domain[0].uuid }}'
+#        register_as: static_nat
