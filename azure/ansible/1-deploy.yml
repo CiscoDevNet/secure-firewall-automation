@@ -8,7 +8,7 @@
     - name: Create resource group
       azure_rm_resourcegroup:
         name: "{{ prefix }}-RG"
-        location: eastus
+        location: "{{ location }}"
       when: create_rg
       register: created_rg_name
     
