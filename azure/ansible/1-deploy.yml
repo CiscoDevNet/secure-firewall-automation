@@ -1,4 +1,4 @@
-- name: Provisioning Secure Firewall
+- name: Provisioning Secure Firewall in Azure
   hosts: localhost
   connection: local
   vars_files:
@@ -138,6 +138,7 @@
         sku: "{{ 'Standard' if instances > 1 else 'Basic' }}"
         allocation_method: "{{ 'static' if instances > 1 else 'dynamic' }}"
       with_sequence: "count={{ instances }}"
+      register: ftd_public_ip
     
     - name: Create a public ip address for FTDv Outside Interface
       azure_rm_publicipaddress:
@@ -154,6 +155,7 @@
         sku: "{{ 'Standard' if instances > 1 else 'Basic' }}"
         allocation_method: "{{ 'static' if instances > 1 else 'dynamic' }}"
       with_sequence: "count={{ 1 if create_fmc else 0 }}"
+      register: fmc_public_ip
     
     # Network Interfaces
     - name: Create a network interface for FTDv Management Interface
@@ -251,7 +253,7 @@
           name: ftdv-azure-byol
           publisher: cisco
           product: cisco-ftdv
-        os_disk_name: "{{ prefix }}-FTD-OSDisk{{ '-'+item if instances > 1 }}"
+        os_disk_name: "{{ prefix }}-ftd-osdisk{{ '-'+item if instances > 1 }}"
         os_disk_caching: ReadWrite
         managed_disk_type: Standard_LRS
         custom_data: "{{ lookup('ansible.builtin.template', 'ftd_startup_file.txt') }}"
@@ -280,10 +282,19 @@
           name: fmcv-azure-byol
           publisher: cisco
           product: cisco-fmcv
-        os_disk_name: "{{ prefix }}-FMC-OSDisk"
+        os_disk_name: "{{ prefix }}-fmc-osdisk"
         os_disk_caching: ReadWrite
         managed_disk_type: Standard_LRS
         custom_data: "{{ lookup('ansible.builtin.template', 'ftd_startup_file.txt') }}"
         admin_username: "{{ username }}"
         admin_password: "{{ fmc_password }}"
       with_sequence: "count={{ 1 if create_fmc else 0 }}"
+    
+    # Lab Info File
+    - name: Store lab info in a file
+      ansible.builtin.copy:
+        dest: lab_info.txt
+        content: |
+          FMC URL         = https://{{ fmc_public_ip.results[0].state.ip_address }}
+          FTD SSH         = ssh -i ftd-key {{ username }}@{{ ftd_public_ip.results[0].state.ip_address }}
+          FTD Console SSH = ssh admin@{{ ftd_public_ip.results[0].state.ip_address }}

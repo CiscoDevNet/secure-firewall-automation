@@ -1,4 +1,4 @@
-- name: Provisioning Secure Firewall
+- name: Destroying Secure Firewall in Azure
   hosts: localhost
   connection: local
   vars_files:
@@ -8,10 +8,10 @@
     - name: Set resource group
       ansible.builtin.set_fact:
         rg: "{{ prefix+'-RG' if create_rg else rg_name }}"
-    
+
     - name: Set virtual network
       ansible.builtin.set_fact:
-        vn: "{{ prefix+'-network' if create_vn else vn_name }}"
+        vn: "{{ prefix+'-Network' if create_vn else vn_name }}"
 
     # FTD Instances
     - name: Delete FTD instances
@@ -20,7 +20,7 @@
         name: "{{ prefix }}-FTD{{ '-'+item if instances > 1 }}"
         state: absent
       with_sequence: "count={{ instances }}"
-    
+
     # FMC
     - name: Delete FMC
       azure_rm_virtualmachine:
@@ -28,16 +28,17 @@
         name: "{{ prefix }}-FMC"
         state: absent
       with_sequence: "count={{ 1 if create_fmc else 0 }}"
-    
-    # Key Pair
+
+    # Key Pair & Files
     - name: Delete FTD key pair
       file:
-        path: '{{ item }}'
+        path: "{{ item }}"
         state: absent
       with_items:
         - ftd-key
         - ftd-key.pub
-    
+        - lab_info.txt
+
     # Public IP Addresses
     - name: Delete public ip - FMC Management Interface
       azure_rm_publicipaddress:
@@ -45,34 +46,34 @@
         name: "{{ prefix }}-fmc-public-ip"
         state: absent
       with_sequence: "count={{ 1 if create_fmc else 0 }}"
-    
+
     - name: Delete public ip - FTDv Outside Interface
       azure_rm_publicipaddress:
         resource_group: "{{ rg }}"
         name: "{{ prefix }}-instance-outside-public-ip{{ '-'+item if instances > 1 }}"
         state: absent
       with_sequence: "count={{ instances }}"
-    
+
     - name: Delete public ip - FTDv Management Interface
       azure_rm_publicipaddress:
         resource_group: "{{ rg }}"
         name: "{{ prefix }}-instance-mgmt-public-ip{{ '-'+item if instances > 1 }}"
         state: absent
       with_sequence: "count={{ instances }}"
-    
+
     # Security Groups
     - name: Delete security group - elb-allow-all
       azure_rm_securitygroup:
         resource_group: "{{ rg }}"
         name: "{{ prefix }}-elb-allow-all"
         state: absent
-    
+
     - name: Delete security group - ilb-allow-all
       azure_rm_securitygroup:
         resource_group: "{{ rg }}"
         name: "{{ prefix }}-ilb-allow-all"
         state: absent
-    
+
     - name: Delete security group - allow-all
       azure_rm_securitygroup:
         resource_group: "{{ rg }}"
@@ -87,7 +88,7 @@
         name: "{{ prefix }}-{{ item.key }}"
         state: absent
       with_dict: "{{ subnet_list }}"
-    
+
     # Route Tables
     - name: Delete route tables
       azure_rm_routetable:
@@ -95,7 +96,7 @@
         name: "{{ prefix }}-rt-{{item.key}}"
         state: absent
       with_dict: "{{ subnet_list }}"
-    
+
     # Virtual Network
     - name: Delete virtual network
       azure_rm_virtualnetwork:
@@ -103,17 +104,17 @@
         name: "{{ vn }}"
         state: absent
       when: create_vn
-    
+
     # OS Disk
     - name: Delete OS Disks
       azure_rm_manageddisk:
-        name: "{{ prefix }}-{{ item }}-OSDisk"
+        name: "{{ prefix }}-{{ item }}-osdisk"
         resource_group: "{{ rg }}"
         state: absent
       with_items:
-        - FMC
-        - FTD
-    
+        - fmc
+        - ftd
+
     # Resource Group
     - name: Delete resource group
       azure_rm_resourcegroup:

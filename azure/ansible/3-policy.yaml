@@ -163,7 +163,7 @@
         operation: upsertHostObject
         data:
           name: web_server_ext
-          value: 172.16.2.50
+          value: 10.0.2.18
           type: Host
         path_params:
           domainUUID: '{{ domain[0].uuid }}'

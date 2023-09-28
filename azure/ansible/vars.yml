@@ -29,9 +29,9 @@ instances: 1
 create_fmc: true
 
 # Keep true to create a new resource group, false if use existing resource group
-create_rg: true
+create_rg: false
 # When create_rg false, mention the name of existing resource group
-rg_name: "SFW"
+rg_name: "suraj2"
 
 # Keep true to create a new virtual network, false if use existing virtual network
 create_vn: true

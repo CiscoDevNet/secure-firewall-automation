@@ -33,7 +33,7 @@
       cisco.fmcansible.fmc_configuration:
         operation: createMultipleDevice
         data:
-          hostName: 172.16.0.10
+          hostName: 10.0.2.11
           license_caps:
             - 'BASE'
             - 'MALWARE'
@@ -47,7 +47,7 @@
           accessPolicy:
             id: '{{ accesspolicy.id }}'
             type: 'AccessPolicy'
-          natID: abc123
+          natID: cisco
         path_params:
           domainUUID: '{{ domain[0].uuid }}'
         register_as: ftd
