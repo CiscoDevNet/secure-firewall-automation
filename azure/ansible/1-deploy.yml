@@ -298,3 +298,24 @@
           FMC URL         = https://{{ fmc_public_ip.results[0].state.ip_address }}
           FTD SSH         = ssh -i ftd-key {{ username }}@{{ ftd_public_ip.results[0].state.ip_address }}
           FTD Console SSH = ssh admin@{{ ftd_public_ip.results[0].state.ip_address }}
+    
+    # Hosts File
+    - name: Create hosts.yaml file for configuration
+      copy:
+        content: |
+          ---
+          all:
+            hosts:
+              fmc:
+                ansible_host: {{ fmc_public_ip.results[0].state.ip_address }}
+                ansible_network_os: cisco.fmcansible.fmc
+                ansible_user: admin
+                ansible_password: "{{ fmc_password }}"
+                ansible_httpapi_port: 443
+                ansible_httpapi_use_ssl: True
+                ansible_httpapi_validate_certs: False
+                ftd_mgmt_ip: 10.0.2.11
+                ftd_reg_key: "{{ reg_key }}"
+                ftd_nat_id: "{{ fmc_nat_id }}"
+                auth_string: "admin:{{ftd_password}}"
+        dest: hosts.yaml

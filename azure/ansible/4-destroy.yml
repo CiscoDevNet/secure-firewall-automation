@@ -38,6 +38,7 @@
         - ftd-key
         - ftd-key.pub
         - lab_info.txt
+        - hosts.yml
 
     # Public IP Addresses
     - name: Delete public ip - FMC Management Interface
