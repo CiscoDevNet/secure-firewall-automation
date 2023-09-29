@@ -30,7 +30,7 @@
         vn: "{{ vn_name if created_vn_name.state is not defined else created_vn_name.state.name }}"
 
     # Route Tables
-    - name: Create a route tables
+    - name: Create route tables
       azure_rm_routetable:
         resource_group: "{{ rg }}"
         name: "{{ prefix }}-rt-{{item.key}}"
@@ -224,7 +224,7 @@
       with_sequence: "count={{ instances }}"
     
     # Key Pair
-    - name: Generate an keypair for FTDs
+    - name: Generate a keypair for FTDs
       community.crypto.openssh_keypair:
         path: ftd-key
         size: 4096
@@ -318,4 +318,4 @@
                 ftd_reg_key: "{{ reg_key }}"
                 ftd_nat_id: "{{ fmc_nat_id }}"
                 auth_string: "admin:{{ftd_password}}"
-        dest: hosts.yaml
+        dest: hosts.yml
