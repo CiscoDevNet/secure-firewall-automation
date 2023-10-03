@@ -2,7 +2,7 @@
   hosts: localhost
   connection: local
   vars_files:
-    - vars.yml
+    - vars.yaml
   tasks:
     # Resouce Group
     - name: Create resource group
@@ -134,7 +134,7 @@
     - name: Create a public ip address for FTDv Management Interface
       azure_rm_publicipaddress:
         resource_group: "{{ rg }}"
-        name: "{{ prefix }}-instance-mgmt-public-ip{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-instance-mgmt-public-ip{{ '-'+item if instances > 1 else '' }}"
         sku: "{{ 'Standard' if instances > 1 else 'Basic' }}"
         allocation_method: "{{ 'static' if instances > 1 else 'dynamic' }}"
       with_sequence: "count={{ instances }}"
@@ -143,7 +143,7 @@
     - name: Create a public ip address for FTDv Outside Interface
       azure_rm_publicipaddress:
         resource_group: "{{ rg }}"
-        name: "{{ prefix }}-instance-outside-public-ip{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-instance-outside-public-ip{{ '-'+item if instances > 1 else '' }}"
         sku: "{{ 'Standard' if instances > 1 else 'Basic' }}"
         allocation_method: "{{ 'static' if instances > 1 else 'dynamic' }}"
       with_sequence: "count={{ instances }}"
@@ -160,41 +160,41 @@
     # Network Interfaces
     - name: Create a network interface for FTDv Management Interface
       azure_rm_networkinterface:
-        name: "{{ prefix }}-management{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-management{{ '-'+item if instances > 1 else '' }}"
         resource_group: "{{ rg }}"
         virtual_network: "{{ vn }}"
         subnet_name: "{{prefix}}-management"
         security_group: "{{ prefix }}-allow-all"
         ip_configurations:
-          - name: "Management{{ '-'+item if instances > 1 }}"
+          - name: "Management{{ '-'+item if instances > 1 else '' }}"
             private_ip_allocation_method: "Static"
             private_ip_address: "{{ ftd_mgmt_ip[item | int-1] }}"
-            public_ip_address_name: "{{ prefix }}-instance-mgmt-public-ip{{ '-'+item if instances > 1 }}"
+            public_ip_address_name: "{{ prefix }}-instance-mgmt-public-ip{{ '-'+item if instances > 1 else '' }}"
       with_sequence: "count={{ instances }}"
     
     - name: Create a network interface for FTDv Diagnostic Interface
       azure_rm_networkinterface:
-        name: "{{ prefix }}-diagnostic{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-diagnostic{{ '-'+item if instances > 1 else '' }}"
         resource_group: "{{ rg }}"
         virtual_network: "{{ vn }}"
         subnet_name: "{{prefix}}-diagnostic"
         security_group: "{{ prefix }}-allow-all"
         ip_configurations:
-          - name: "Diagnostic{{ '-'+item if instances > 1 }}"
+          - name: "Diagnostic{{ '-'+item if instances > 1 else '' }}"
             private_ip_allocation_method: "Dynamic"
       with_sequence: "count={{ instances }}"
     
     - name: Create a network interface for FTDv Outside Interface
       azure_rm_networkinterface:
-        name: "{{ prefix }}-outside{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-outside{{ '-'+item if instances > 1 else '' }}"
         resource_group: "{{ rg }}"
         virtual_network: "{{ vn }}"
         subnet_name: "{{prefix}}-outside"
         security_group: "{{ prefix }}-elb-allow-all"
         ip_configurations:
-          - name: "Outside{{ '-'+item if instances > 1 }}"
+          - name: "Outside{{ '-'+item if instances > 1 else '' }}"
             private_ip_allocation_method: "Dynamic"
-            public_ip_address_name: "{{ prefix }}-instance-outside-public-ip{{ '-'+item if instances > 1 }}"
+            public_ip_address_name: "{{ prefix }}-instance-outside-public-ip{{ '-'+item if instances > 1 else '' }}"
       with_sequence: "count={{ instances }}"
 
     - name: Create a network interface for FMC Management Interface
@@ -213,13 +213,13 @@
 
     - name: Create a network interface for FTDv Inside Interface
       azure_rm_networkinterface:
-        name: "{{ prefix }}-inside{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-inside{{ '-'+item if instances > 1 else '' }}"
         resource_group: "{{ rg }}"
         virtual_network: "{{ vn }}"
         subnet_name: "{{prefix}}-inside"
         security_group: "{{ prefix }}-ilb-allow-all"
         ip_configurations:
-          - name: "Inside{{ '-'+item if instances > 1 }}"
+          - name: "Inside{{ '-'+item if instances > 1 else '' }}"
             private_ip_allocation_method: "Dynamic"
       with_sequence: "count={{ instances }}"
     
@@ -236,8 +236,8 @@
     - name: Create FTDv instances
       azure_rm_virtualmachine:
         resource_group: "{{ rg }}"
-        name: "{{ prefix }}-FTD{{ '-'+item if instances > 1 }}"
-        short_hostname: "{{ instancename }}{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-FTD{{ '-'+item if instances > 1 else '' }}"
+        short_hostname: "{{ instancename }}{{ '-'+item if instances > 1 else '' }}"
         image:
           publisher: cisco
           offer: cisco-ftdv
@@ -245,15 +245,15 @@
           version: "{{ ftd_image_version }}"
         vm_size: "{{ vm_size }}"
         network_interface_names:
-          - "{{ prefix }}-management{{ '-'+item if instances > 1 }}"
-          - "{{ prefix }}-diagnostic{{ '-'+item if instances > 1 }}"
-          - "{{ prefix }}-outside{{ '-'+item if instances > 1 }}"
-          - "{{ prefix }}-inside{{ '-'+item if instances > 1 }}"
+          - "{{ prefix }}-management{{ '-'+item if instances > 1 else '' }}"
+          - "{{ prefix }}-diagnostic{{ '-'+item if instances > 1 else '' }}"
+          - "{{ prefix }}-outside{{ '-'+item if instances > 1 else '' }}"
+          - "{{ prefix }}-inside{{ '-'+item if instances > 1 else '' }}"
         plan:
           name: ftdv-azure-byol
           publisher: cisco
           product: cisco-ftdv
-        os_disk_name: "{{ prefix }}-ftd-osdisk{{ '-'+item if instances > 1 }}"
+        os_disk_name: "{{ prefix }}-ftd-osdisk{{ '-'+item if instances > 1 else '' }}"
         os_disk_caching: ReadWrite
         managed_disk_type: Standard_LRS
         custom_data: "{{ lookup('ansible.builtin.template', 'ftd_startup_file.txt') }}"
@@ -295,9 +295,9 @@
       ansible.builtin.copy:
         dest: lab_info.txt
         content: |
-          FMC URL         = https://{{ fmc_public_ip.results[0].state.ip_address }}
-          FTD SSH         = ssh -i ftd-key {{ username }}@{{ ftd_public_ip.results[0].state.ip_address }}
-          FTD Console SSH = ssh admin@{{ ftd_public_ip.results[0].state.ip_address }}
+          FMC URL         = https://<FMC_PUBLIC_IP>
+          FTD SSH         = ssh -i ftd-key {{ username }}@<FTD_PUBLIC_IP>
+          FTD Console SSH = ssh admin@<FTD_PUBLIC_IP>
     
     # Hosts File
     - name: Create hosts.yaml file for configuration
@@ -307,7 +307,7 @@
           all:
             hosts:
               fmc:
-                ansible_host: {{ fmc_public_ip.results[0].state.ip_address }}
+                ansible_host: <FMC_PUBLIC_IP>
                 ansible_network_os: cisco.fmcansible.fmc
                 ansible_user: admin
                 ansible_password: "{{ fmc_password }}"
@@ -318,4 +318,4 @@
                 ftd_reg_key: "{{ reg_key }}"
                 ftd_nat_id: "{{ fmc_nat_id }}"
                 auth_string: "admin:{{ftd_password}}"
-        dest: hosts.yml
+        dest: hosts.yaml
