@@ -38,7 +38,7 @@
         - ftd-key
         - ftd-key.pub
         - lab_info.txt
-        - hosts.yml
+        - hosts.yaml
 
     # Public IP Addresses
     - name: Delete public ip - FMC Management Interface
@@ -106,15 +106,20 @@
         state: absent
       when: create_vn
 
-    # OS Disk
-    - name: Delete OS Disks
+    # OS Disks
+    - name: Delete FTD OS Disks
       azure_rm_manageddisk:
-        name: "{{ prefix }}-{{ item }}-osdisk"
+        name: "{{ prefix }}-ftd-osdisk{{ '-'+item if instances > 1 else '' }}"
         resource_group: "{{ rg }}"
         state: absent
-      with_items:
-        - fmc
-        - ftd
+      with_sequence: "count={{ instances }}"
+
+    - name: Delete FMC OS Disks
+      azure_rm_manageddisk:
+        name: "{{ prefix }}-fmc-osdisk"
+        resource_group: "{{ rg }}"
+        state: absent
+      with_sequence: "count={{ 1 if create_fmc else 0 }}"
 
     # Resource Group
     - name: Delete resource group

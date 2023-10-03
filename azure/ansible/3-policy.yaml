@@ -95,14 +95,14 @@
           enabled: True
           mode: NONE
           type: PhysicalInterface
-          name: TenGigabitEthernet0/0
+          name: GigabitEthernet0/0
           securityZone:
             id: '{{ ext_zone.id }}'
             type: SecurityZone
         path_params:
           domainUUID: '{{ domain[0].uuid }}'
           containerUUID: '{{ device_list[0].id }}'
-          objectId: '{{ physical_interfaces[1].id }}'
+          objectId: '{{ physical_interfaces[0].id }}'
     - name: Inside Interface
       cisco.fmcansible.fmc_configuration:
         operation: updateFTDPhysicalInterface
@@ -116,14 +116,14 @@
           enabled: True
           mode: NONE
           type: PhysicalInterface
-          name: TenGigabitEthernet0/1
+          name: GigabitEthernet0/1
           securityZone:
             id: '{{ int_zone.id }}'
             type: SecurityZone
         path_params:
           domainUUID: '{{ domain[0].uuid }}'
           containerUUID: '{{ device_list[0].id }}'
-          objectId: '{{ physical_interfaces[2].id }}'
+          objectId: '{{ physical_interfaces[1].id }}'
 
     # Network Objects
     - name: Internal Network
