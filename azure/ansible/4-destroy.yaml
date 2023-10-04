@@ -2,7 +2,7 @@
   hosts: localhost
   connection: local
   vars_files:
-    - vars.yml
+    - vars.yaml
   tasks:
     # Set facts
     - name: Set resource group
@@ -17,7 +17,7 @@
     - name: Delete FTD instances
       azure_rm_virtualmachine:
         resource_group: "{{ rg }}"
-        name: "{{ prefix }}-FTD{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-FTD{{ '-'+item if instances > 1 else '' }}"
         state: absent
       with_sequence: "count={{ instances }}"
 
@@ -51,14 +51,14 @@
     - name: Delete public ip - FTDv Outside Interface
       azure_rm_publicipaddress:
         resource_group: "{{ rg }}"
-        name: "{{ prefix }}-instance-outside-public-ip{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-instance-outside-public-ip{{ '-'+item if instances > 1 else '' }}"
         state: absent
       with_sequence: "count={{ instances }}"
 
     - name: Delete public ip - FTDv Management Interface
       azure_rm_publicipaddress:
         resource_group: "{{ rg }}"
-        name: "{{ prefix }}-instance-mgmt-public-ip{{ '-'+item if instances > 1 }}"
+        name: "{{ prefix }}-instance-mgmt-public-ip{{ '-'+item if instances > 1 else '' }}"
         state: absent
       with_sequence: "count={{ instances }}"
 
