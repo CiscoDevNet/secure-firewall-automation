@@ -1,0 +1,26 @@
+---
+- name: Add ansible inventory to CDO
+  hosts: all
+  connection: local
+  tasks:
+    - name: Add ASA to CDO
+      when: hostvars[inventory_hostname].device_type == "asa" or hostvars[inventory_hostname].device_type == "ios"
+      cisco.cdo.device_inventory:
+        api_key: "{{ lookup('ansible.builtin.env', 'CDO_API_KEY') }}"
+        region: "{{ lookup('ansible.builtin.env', 'CDO_REGION') }}"
+        add:
+          asa_ios:
+            sdc: "{{ hostvars[inventory_hostname].sdc if hostvars[inventory_hostname].sdc is defined }}"
+            device_name: "{{ inventory_hostname }}"
+            ipv4: "{{ hostvars[inventory_hostname].ipv4 }}"
+            mgmt_port: "{{ hostvars[inventory_hostname].mgmt_port }}"
+            device_type: "{{ hostvars[inventory_hostname].device_type }}"
+            username: "{{ hostvars[inventory_hostname].username }}"
+            password: "{{ hostvars[inventory_hostname].password }}"
+            ignore_cert: "{{ hostvars[inventory_hostname].ignore_cert }}"
+      register: added_device
+      failed_when: (added_device.stderr is defined) and (added_device.stderr | length > 0)
+
+    - name: Print results
+      ansible.builtin.debug:
+        msg: "{{ added_device }}"
