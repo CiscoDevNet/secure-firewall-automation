@@ -1,0 +1,19 @@
+---
+- name: Get pending device changes based on our inventory file
+  hosts: all
+  connection: local
+  tasks:
+    - name: Get the pending deploy for all devices in the inventory
+      cisco.cdo.deploy:
+        api_key: "{{ lookup('ansible.builtin.env', 'CDO_API_KEY') }}"
+        region: "{{ lookup('ansible.builtin.env', 'CDO_REGION') }}"
+        pending:
+          device_type: "{{ hostvars[inventory_hostname].device_type }}"
+          device_name: "{{ inventory_hostname }}"
+      register: pending_deploy
+      failed_when: (pending_deploy.stderr is defined) and (pending_deploy.stderr | length > 0)
+
+    - name: Print All Results for this specific devices
+      ansible.builtin.debug:
+        msg:
+          "{{ pending_deploy.stdout | default('') }}"

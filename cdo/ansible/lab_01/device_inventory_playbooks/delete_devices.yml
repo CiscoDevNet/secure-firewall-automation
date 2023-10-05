@@ -1,0 +1,19 @@
+---
+- name: Delete devices from CDO inventory
+  hosts: all
+  connection: local
+  tasks:
+    - name: Delete devices from CDO inventory
+      cisco.cdo.device_inventory:
+        api_key: "{{ lookup('ansible.builtin.env', 'CDO_API_KEY') }}"
+        region: "{{ lookup('ansible.builtin.env', 'CDO_REGION') }}"
+        delete:
+          device_name: "{{ inventory_hostname }}"
+          device_type: "{{ hostvars[inventory_hostname].device_type }}"
+      register: deleted_device
+      failed_when: (deleted_device.stderr is defined) and (deleted_device.stderr | length > 0)
+
+    - name: Print results
+      ansible.builtin.debug:
+        msg:
+          "{{ deleted_device }}"

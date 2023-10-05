@@ -1,0 +1,45 @@
+---
+# TODO: Move credentials to vault. Here for demo purposes
+CDO_your_cdo_tenant_name:
+  hosts:
+    Austin:
+      device_type: asa
+      ipv4: your_asa_ip
+      mgmt_port: your_asa_asdm_port
+      sdc: CDO_YOUR_SDC_NAME
+      username: your_asa_username
+      password: your_asa_password
+      ignore_cert: false
+    Amarillo:
+      device_type: ios
+      ipv4: your_ios_ip
+      mgmt_port: your_ios_ssh_port
+      sdc: CDO_YOUR_SDC_NAME
+      username: your_ios_username
+      password: your_ios_password
+    ElPaso:
+      device_type: ftd
+      onboard_method: cli
+      access_control_policy: Default Access Control Policy
+      is_virtual: true
+      performance_tier: FTDv10
+      license:
+        - BASE
+        - THREAT
+        - URLFilter
+        - MALWARE
+        - PLUS
+    Galveston:
+      device_type: ftd
+      onboard_method: ltp
+      serial: your_serial_number
+      password: your_desired_new_admin_password
+      access_control_policy: Default Access Control Policy
+      is_virtual: true
+      performance_tier: FTDv10
+      license:
+        - BASE
+        - THREAT
+        - URLFilter
+        - MALWARE
+        - PLUS

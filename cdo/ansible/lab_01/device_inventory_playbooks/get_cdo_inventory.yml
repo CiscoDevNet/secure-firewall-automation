@@ -1,0 +1,27 @@
+---
+- name: Get device inventory details from CDO irrespective of the Ansible inventory
+  hosts: localhost
+  tasks:
+    - name: Get the CDO inventory for this tenant
+      cisco.cdo.device_inventory:
+        api_key: "{{ lookup('ansible.builtin.env', 'CDO_API_KEY') }}"
+        region: "{{ lookup('ansible.builtin.env', 'CDO_REGION') }}"
+        gather:
+          device_type: "all"
+      register: inventory
+      failed_when: (inventory.stderr is defined) and (inventory.stderr | length > 0)
+
+    - name: Print All Results for all devices, all fields
+      ansible.builtin.debug:
+        msg:
+          "{{ inventory.stdout }}"
+
+    - name: Filter Results for desired data using json query
+      # Requires python3 package jmespath
+      ansible.builtin.debug:
+        msg:
+          "{{ inventory.stdout | community.general.json_query(jmesquery) }}"
+      vars:
+        jmesquery: >-
+          [*].{name: name, serial:serial, chassisSerial:chassisSerial, softwareVersion: softwareVersion, type:type,
+          deviceType:deviceType, uid:uid, ipv4:ipv4, port:port, ignoreCertificate:ignoreCertificate}
