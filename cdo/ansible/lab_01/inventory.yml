@@ -17,6 +17,7 @@ CDO_your_cdo_tenant_name:
       sdc: CDO_YOUR_SDC_NAME
       username: your_ios_username
       password: your_ios_password
+      ignore_cert: false
     ElPaso:
       device_type: ftd
       onboard_method: cli

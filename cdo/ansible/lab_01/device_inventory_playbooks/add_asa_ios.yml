@@ -3,7 +3,7 @@
   hosts: all
   connection: local
   tasks:
-    - name: Add ASA to CDO
+    - name: Add ASA and IOS devices to CDO
       when: hostvars[inventory_hostname].device_type == "asa" or hostvars[inventory_hostname].device_type == "ios"
       cisco.cdo.device_inventory:
         api_key: "{{ lookup('ansible.builtin.env', 'CDO_API_KEY') }}"
