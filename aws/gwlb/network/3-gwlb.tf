@@ -4,7 +4,7 @@
 
 # Gateway Load Balancing related resources
 resource "aws_lb" "gwlb" {
-  name                             = "gwlb"
+  name                             = "${var.env_name}-gwlb"
   load_balancer_type               = "gateway"
   subnets                          = [aws_subnet.data_subnet.id]
   enable_cross_zone_load_balancing = true
@@ -17,7 +17,7 @@ resource "aws_lb" "gwlb" {
 
 # Target group is IP based since FTD's are provisioned with multiple interfaces
 resource "aws_lb_target_group" "ftd" {
-  name        = "ftdtg"
+  name        = "${var.env_name}-ftdtg"
   protocol    = "GENEVE"
   vpc_id      = aws_vpc.srvc_vpc.id
   target_type = "ip"

@@ -70,7 +70,7 @@ resource "aws_instance" "ftd" {
   user_data                   = <<-EOT
   {
      "AdminPassword":"${var.ftd_pass}",
-     "Hostname":"FTDv",
+     "Hostname":"${var.env_name}-FTDv",
      "ManageLocally":"No",
      "FmcIp": "${local.fmc_mgmt_ip}",
      "FmcRegKey":"${var.ftd_reg_key}",
@@ -169,7 +169,7 @@ resource "aws_instance" "fmcv" {
   user_data = <<-EOT
   {
    "AdminPassword":"${var.ftd_pass}",
-   "Hostname":"FMCv"
+   "Hostname":"${var.env_name}-FMCv"
   }
   EOT
 
