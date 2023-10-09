@@ -2,6 +2,8 @@
 # Variable Assignments
 #########################
 
+# Environment Name - This name will be tagged to all AWS resources
+env_name = ""
 
 # To deploy an FMCv in the mgmt subnet set "create_fmcv" to true. If using cdFMC in CDO set value to false.
 # This value must be set!

@@ -11,14 +11,14 @@ resource "fmc_smart_license" "license" {
 # Create default Access Control Policy
 resource "fmc_access_policies" "access_policy" {
   depends_on = [fmc_smart_license.license]
-  name           = "FTDv-Access-Policy"
+  name           = "${var.env_name}-Access-Policy"
   default_action = "block"
 }
 
 ## Register Device to FMC
 resource "fmc_devices" "ftd" {
   depends_on = [fmc_access_policies.access_policy]
-  name = "FTDv"
+  name = "${var.env_name}-FTDv"
   hostname = local.ftd_mgmt_ip
   regkey = var.ftd_reg_key
   nat_id = var.ftd_nat_id

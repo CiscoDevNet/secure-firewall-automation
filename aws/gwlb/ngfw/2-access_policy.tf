@@ -18,21 +18,21 @@ data "fmc_ips_policies" "ips_policy" {
 
 # Network Objects
 resource "fmc_network_objects" "app_subnet" {
-  name        = "app_subnet"
+  name        = "${var.env_name}-app_subnet"
   value       = var.app_subnet
   description = "App Network"
 }
 
 # Host Objects
 resource "fmc_host_objects" "app_server" {
-    name        = "app_server"
+    name        = "${var.env_name}-app_server"
     value       = var.app_server
     description = "App Server"
 }
 
 # IPS Policy
 resource "fmc_ips_policies" "ips_policy" {
-    name            = "ftdv_ips_policy"
+    name            = "${var.env_name}-ips_policy"
     inspection_mode = "DETECTION"
     basepolicy_id   = data.fmc_ips_policies.ips_policy.id
 }
@@ -44,7 +44,7 @@ resource "fmc_access_rules" "access_rule_1" {
     depends_on = [fmc_access_policies.access_policy]
     acp                = fmc_access_policies.access_policy.id
     section            = "mandatory"
-    name               = "Permit Outbound"
+    name               = "${var.env_name}_permit_outbound"
     action             = "allow"
     enabled            = true
     send_events_to_fmc = true
@@ -68,14 +68,14 @@ resource "fmc_access_rules" "access_rule_1" {
         }
     }
     ips_policy   = fmc_ips_policies.ips_policy.id
-    new_comments = ["outbound web traffic"]
+    new_comments = ["${var.env_name} outbound web traffic"]
 }
 
 resource "fmc_access_rules" "access_rule_2" {
     depends_on = [fmc_access_policies.access_policy]
     acp                = fmc_access_policies.access_policy.id
     section            = "mandatory"
-    name               = "Access to App Server"
+    name               = "${var.env_name}_access_to_app_server"
     action             = "allow"
     enabled            = true
     send_events_to_fmc = true
@@ -95,5 +95,5 @@ resource "fmc_access_rules" "access_rule_2" {
         }
     }
     ips_policy   = fmc_ips_policies.ips_policy.id
-    new_comments = ["SSH to App Server"]
+    new_comments = ["${var.env_name} ssh to app server"]
 }

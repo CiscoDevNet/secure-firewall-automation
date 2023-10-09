@@ -2,6 +2,11 @@
 # Variables
 #################
 
+# Env name is tagged on all resources
+variable "env_name" {
+  default = "NGFW"
+}
+
 variable "create_fmcv" {
   type = bool
 }
