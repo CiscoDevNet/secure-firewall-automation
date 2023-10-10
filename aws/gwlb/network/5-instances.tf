@@ -77,7 +77,7 @@ resource "aws_instance" "ftd" {
      "FmcNatId":"${var.ftd_nat_id}",
      "Cluster":{
         "CclSubnetRange":"10.0.2.4 10.0.2.30",
-        "ClusterGroupName":"ftd-cluster",
+        "ClusterGroupName":"${var.env_name}-cluster",
         "Geneve":"Yes",
         "HealthProbePort":"7777"
      }
