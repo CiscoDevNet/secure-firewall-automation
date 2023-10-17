@@ -17,6 +17,7 @@
             performance_tier: "{{ hostvars[inventory_hostname].performance_tier }}"
             license: "{{ hostvars[inventory_hostname].license }}"
             serial: "{{ hostvars[inventory_hostname].serial | default(omit) }}"
+            password: "{{ hostvars[inventory_hostname].password | default(omit) }}"
       register: added_device
       failed_when: (added_device.stderr is defined) and (added_device.stderr | length > 0)
 
