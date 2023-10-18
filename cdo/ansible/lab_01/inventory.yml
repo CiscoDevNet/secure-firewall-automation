@@ -5,7 +5,7 @@ CDO_your_cdo_tenant_name:
     Austin:
       device_type: asa
       ipv4: your_asa_ip
-      mgmt_port: your_asa_asdm_port
+      mgmt_port: 443
       sdc: CDO_YOUR_SDC_NAME
       username: your_asa_username
       password: your_asa_password
@@ -13,7 +13,7 @@ CDO_your_cdo_tenant_name:
     Amarillo:
       device_type: ios
       ipv4: your_ios_ip
-      mgmt_port: your_ios_ssh_port
+      mgmt_port: 22
       sdc: CDO_YOUR_SDC_NAME
       username: your_ios_username
       password: your_ios_password
