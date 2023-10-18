@@ -18,6 +18,8 @@ CDO_your_cdo_tenant_name:
       username: your_ios_username
       password: your_ios_password
       ignore_cert: false
+      delay: 20
+      retry: 2
     ElPaso:
       device_type: ftd
       onboard_method: cli

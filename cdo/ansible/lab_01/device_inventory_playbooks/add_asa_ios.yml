@@ -18,6 +18,8 @@
             username: "{{ hostvars[inventory_hostname].username }}"
             password: "{{ hostvars[inventory_hostname].password }}"
             ignore_cert: "{{ hostvars[inventory_hostname].ignore_cert }}"
+            delay: "{{ hostvars[inventory_hostname].delay | default(omit) }}"
+            retry: "{{ hostvars[inventory_hostname].retry | default(omit) }}"
       register: added_device
       failed_when: (added_device.stderr is defined) and (added_device.stderr | length > 0)
 
