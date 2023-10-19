@@ -23,7 +23,7 @@ aws_az = "us-east-1a"
 ftd_pass = "123Cisco@123!"
 
 # Enter cdFMC FQDN if "create_fmcv" is set to false.
-cdFMC = "cisco-fw-automation-lab-3.app.us.cdo.cisco.com"
+cdFMC = "cisco-fw-automation-lab-4.app.us.cdo.cisco.com"
 
 # ftd reg key and nat id are needed for both FMCv and cdFMC deployments
 ftd_reg_key = "cisco"

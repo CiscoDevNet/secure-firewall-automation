@@ -13,7 +13,7 @@ create_fmcv   = false
 fmc_pass      = "123Cisco@123!"
 
 # Enter cdFMC FQDN if "create_fmcv" is set to false.
-cdFMC         = "cisco-fw-automation-lab-3.app.us.cdo.cisco.com"
+cdFMC         = "cisco-fw-automation-lab-4.app.us.cdo.cisco.com"
 
 # Enter CDO Token if "create_fmcv" is set to false.
 cdo_token     = ""
