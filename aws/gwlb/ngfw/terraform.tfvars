@@ -3,7 +3,7 @@
 #########################
 
 # Environment Name - This name will be tagged to all AWS resources
-env_name = "Pod-#"
+env_name = ""
 
 # To deploy an FMCv in the mgmt subnet set "create_fmcv" to true. If using cdFMC in CDO set value to false.
 # This value must be set!
@@ -13,7 +13,7 @@ create_fmcv   = false
 fmc_pass      = "123Cisco@123!"
 
 # Enter cdFMC FQDN if "create_fmcv" is set to false.
-cdFMC         = "cisco-fw-automation-lab-4.app.us.cdo.cisco.com"
+cdFMC         = ""
 
 # Enter CDO Token if "create_fmcv" is set to false.
 cdo_token     = ""
