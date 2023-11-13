@@ -149,7 +149,7 @@ resource "fmc_access_rules" "access_rule_1" {
     enabled            = true
     send_events_to_fmc = true
     log_files          = false
-    log_begin          = true
+    log_begin          = false
     log_end            = true
     source_zones {
         source_zone {
