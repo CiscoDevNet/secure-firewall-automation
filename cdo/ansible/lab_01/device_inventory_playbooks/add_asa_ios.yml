@@ -3,7 +3,7 @@
   hosts: all
   connection: local
   tasks:
-    - name: Add ASA and IOS devices to CDO
+    - name: Add ASA or IOS device to CDO
       when: hostvars[inventory_hostname].device_type == "asa" or hostvars[inventory_hostname].device_type == "ios"
       cisco.cdo.device_inventory:
         api_key: "{{ lookup('ansible.builtin.env', 'CDO_API_KEY') }}"
@@ -18,11 +18,10 @@
             username: "{{ hostvars[inventory_hostname].username }}"
             password: "{{ hostvars[inventory_hostname].password }}"
             ignore_cert: "{{ hostvars[inventory_hostname].ignore_cert }}"
-            delay: "{{ hostvars[inventory_hostname].delay | default(omit) }}"
-            retry: "{{ hostvars[inventory_hostname].retry | default(omit) }}"
       register: added_device
       failed_when: (added_device.stderr is defined) and (added_device.stderr | length > 0)
 
     - name: Print results
+      when: added_device['cdo'] is defined
       ansible.builtin.debug:
-        msg: "{{ added_device }}"
+        msg: "{{ added_device.cdo | default('') }}"

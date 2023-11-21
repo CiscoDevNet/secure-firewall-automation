@@ -14,6 +14,7 @@
       failed_when: (deleted_device.stderr is defined) and (deleted_device.stderr | length > 0)
 
     - name: Print results
+      when: deleted_device['cdo'] is defined
       ansible.builtin.debug:
         msg:
-          "{{ deleted_device }}"
+          "{{ deleted_device.cdo | default('') }}"

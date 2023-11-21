@@ -9,10 +9,12 @@
         region: "{{ lookup('ansible.builtin.env', 'CDO_REGION') }}"
         deploy:
           device_name: "{{ inventory_hostname }}"
+          timeout: 20
+          interval: 2
       register: deploy
       failed_when: (deploy.stderr is defined) and (deploy.stderr | length > 0)
 
     - name: Print All Results
       ansible.builtin.debug:
         msg:
-          "{{ deploy }}"
+          "{{ deploy.cdo | default('') }}"

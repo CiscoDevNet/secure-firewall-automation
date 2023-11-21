@@ -11,17 +11,8 @@
       register: inventory
       failed_when: (inventory.stderr is defined) and (inventory.stderr | length > 0)
 
-    - name: Print All Results for all devices, all fields
+    - name: Print inventory results
+      when: inventory.cdo is defined
       ansible.builtin.debug:
         msg:
-          "{{ inventory.stdout }}"
-
-    - name: Filter Results for desired data using json query
-      # Requires python3 package jmespath
-      ansible.builtin.debug:
-        msg:
-          "{{ inventory.stdout | community.general.json_query(jmesquery) }}"
-      vars:
-        jmesquery: >-
-          [*].{name: name, serial:serial, chassisSerial:chassisSerial, softwareVersion: softwareVersion, type:type,
-          deviceType:deviceType, uid:uid, ipv4:ipv4, port:port, ignoreCertificate:ignoreCertificate}
+          "{{ inventory.cdo | default('') }}"
