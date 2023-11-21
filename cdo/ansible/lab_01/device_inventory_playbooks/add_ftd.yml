@@ -3,7 +3,7 @@
   hosts: all
   connection: local
   tasks:
-    - name: Add FTD to CDO and cdFMC via CLI or LTP
+    - name: Adding FTD to CDO and cdFMC via CLI or LTP
       when: hostvars[inventory_hostname].device_type == "ftd"
       cisco.cdo.device_inventory:
         api_key: "{{ lookup('ansible.builtin.env', 'CDO_API_KEY') }}"
@@ -13,22 +13,16 @@
             device_name: "{{ inventory_hostname }}"
             onboard_method: "{{ hostvars[inventory_hostname].onboard_method }}"
             access_control_policy: "{{ hostvars[inventory_hostname].access_control_policy }}"
-            is_virtual: "{{ hostvars[inventory_hostname].is_virtual }}"
-            performance_tier: "{{ hostvars[inventory_hostname].performance_tier }}"
+            is_virtual: "{{ hostvars[inventory_hostname].is_virtual | default(omit) }}"
+            performance_tier: "{{ hostvars[inventory_hostname].performance_tier | default(omit) }}"
             license: "{{ hostvars[inventory_hostname].license }}"
             serial: "{{ hostvars[inventory_hostname].serial | default(omit) }}"
             password: "{{ hostvars[inventory_hostname].password | default(omit) }}"
       register: added_device
       failed_when: (added_device.stderr is defined) and (added_device.stderr | length > 0)
 
-    - name: Print CLI FTD results
-      when: added_device.stdout['metadata'] is defined and hostvars[inventory_hostname].device_type == "ftd"
+    - name: Print Add FTD results
+      when: added_device['cdo'] is defined
       ansible.builtin.debug:
         msg:
-          "{{ added_device.stdout['metadata']['generatedCommand'] }}"
-
-    - name: Print LTP FTD results
-      when: added_device.stdout['metadata'] is not defined and hostvars[inventory_hostname].device_type == "ftd"
-      ansible.builtin.debug:
-        msg:
-          "{{ added_device.stdout }}"
+          "{{ added_device.cdo | default('') }}"

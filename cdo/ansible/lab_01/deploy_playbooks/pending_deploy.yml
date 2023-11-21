@@ -16,4 +16,4 @@
     - name: Print All Results for this specific devices
       ansible.builtin.debug:
         msg:
-          "{{ pending_deploy.stdout | default('') }}"
+          "{{ pending_deploy.cdo | default('') }}"
