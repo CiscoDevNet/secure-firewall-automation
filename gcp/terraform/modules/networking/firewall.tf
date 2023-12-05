@@ -17,7 +17,7 @@ resource "google_compute_firewall" "allow-ssh-mgmt" {
     ports    = ["22"]
   }
 
-  source_ranges           = ["72.163.220.0/24", "10.10.2.0/24"]
+  source_ranges           = ["0.0.0.0/0"]
   target_service_accounts = [var.service_account]
 }
 
@@ -31,7 +31,7 @@ resource "google_compute_firewall" "allow-https-mgmt" {
     ports    = ["443"]
   }
 
-  source_ranges           = ["72.163.220.0/24" , "10.10.2.0/24"]
+  source_ranges           = ["0.0.0.0/0"]
   target_service_accounts = [var.service_account]
 }
 
@@ -45,7 +45,7 @@ resource "google_compute_firewall" "allow-tunnel-mgmt" {
     ports    = ["8305"]
   }
 
-  source_ranges           = ["72.163.220.0/24", "10.10.2.0/24"]
+  source_ranges           = ["0.0.0.0/0"]
   target_service_accounts = [var.service_account]
 }
 
@@ -64,7 +64,7 @@ resource "google_compute_firewall" "allow-ssh-outside" {
     ports    = ["22"]
   }
 
-  source_ranges           = ["72.163.220.0/24", "10.10.2.0/24"]
+  source_ranges           = ["0.0.0.0/0"]
   target_service_accounts = [var.service_account]
 }
 
@@ -78,7 +78,7 @@ resource "google_compute_firewall" "allow-http-outside" {
     ports    = ["80"]
   }
 
-  source_ranges           = ["72.163.220.0/24", "10.10.2.0/24"]
+  source_ranges           = ["0.0.0.0/0"]
   target_service_accounts = [var.service_account]
 }
 
@@ -95,7 +95,7 @@ resource "google_compute_firewall" "allow-ssh-inside" {
     protocol = "tcp"
     ports    = ["22"]
   }
-  source_ranges           = ["72.163.220.0/24", "10.10.2.0/24"]
+  source_ranges           = ["0.0.0.0/0"]
   target_service_accounts = [var.service_account]
 }
 
@@ -109,6 +109,6 @@ resource "google_compute_firewall" "allow-http-inside" {
     ports    = ["80"]
   }
 
-  source_ranges           = ["72.163.220.0/24", "10.10.2.0/24"]
+  source_ranges           = ["0.0.0.0/0"]
   target_service_accounts = [var.service_account]
 }
