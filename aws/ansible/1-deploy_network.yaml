@@ -247,7 +247,7 @@
         var: fmc_mgmt_ip
 
     # Hosts file
-    - name: "Create lab_info.txt file"
+    - name: "Create hosts.yaml file"
       copy:
         content: |
           ---
@@ -268,7 +268,7 @@
         dest: "./hosts.yaml"
 
     # Lab Info
-    - name: "Create host.yaml file"
+    - name: "Create lab_info.txt file"
       copy:
         content: |
           FMC URL  = https://{{ fmc_mgmt_ip.public_ip }}
