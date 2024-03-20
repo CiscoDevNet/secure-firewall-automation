@@ -7,3 +7,4 @@
 .idea/modules.xml
 .idea/secure-firewall-automation.iml
 .idea/vcs.xml
+mcd/aws/centralized_inet/terraform.tfvars
