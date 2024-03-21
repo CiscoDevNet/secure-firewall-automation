@@ -108,3 +108,29 @@ module "yelb-vpc" {
   egress_service_vpc_id = module.egress-service-vpc.service_vpc_id
   ingress_service_vpc_id = module.ingress-service-vpc.service_vpc_id
 }
+
+##################################################
+# Create a Yelb Application on EC2 Running Docker
+##################################################
+
+module "yelb-app" {
+  depends_on = [module.yelb-vpc]
+  source = "./modules/standard-lb-app"
+  env_name = var.env_name
+  app_name = "yelb"
+  app_service = "8080"
+  app_protocol = "TCP"
+  spoke_vpc_id = module.yelb-vpc.spoke_vpc_id
+  spoke_subnets = module.yelb-vpc.spoke_subnets
+  aws_availability_zones = var.aws_availability_zones
+  instance_image = "DockerCompose-Ubuntu-*"
+  instance_type = "t2.medium"
+  ssh_key_pair = var.ssh_key_pair
+  user_data = <<-EOT
+  #!/bin/bash
+  git clone https://github.com/emcnicholas/demo-kind-yelb.git
+  cd demo-kind-yelb/
+  sudo docker compose up -d
+  docker ps
+  EOT
+}
