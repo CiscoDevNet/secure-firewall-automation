@@ -23,3 +23,8 @@ mcd/aws/centralized_inet/nas-private-key.pem
 mcd/aws/centralized_inet/terraform.tfstate
 mcd/aws/centralized_inet/terraform.tfstate.backup
 mcd/aws/centralized_inet/tfplan
+mcd/aws/centralized_inet/.terraform/modules/modules.json
+mcd/aws/centralized_inet/valtix_api_key_file.json
+mcd/aws/centralized_inet/valtix_api_key_file.json
+mcd/aws/centralized_inet/valtix_api_key_file.json
+mcd/aws/centralized_inet/valtix_api_key_file.json
