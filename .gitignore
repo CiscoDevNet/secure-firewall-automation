@@ -28,3 +28,6 @@ mcd/aws/centralized_inet/valtix_api_key_file.json
 mcd/aws/centralized_inet/valtix_api_key_file.json
 mcd/aws/centralized_inet/valtix_api_key_file.json
 mcd/aws/centralized_inet/valtix_api_key_file.json
+mcd/aws/centralized_inet/.terraform/modules/eks-cluster.lb_role/
+mcd/aws/centralized_inet/terraform.tfstate.1711208979.backup
+mcd/aws/centralized_inet/terraform.tfstate.1711229693.backup

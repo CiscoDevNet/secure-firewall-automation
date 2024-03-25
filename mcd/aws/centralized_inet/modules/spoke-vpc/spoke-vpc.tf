@@ -54,6 +54,7 @@ resource "aws_subnet" "spoke_subnet" {
     Name    = "${var.env_name}-${var.app_name}-subnet-${count.index + 1}"
     prefix = var.env_name
     app  = var.app_name
+    #"kubernetes.io/role/internal-elb" = 1
   }
 }
 

@@ -1,0 +1,2 @@
+variable "spoke_subnets" {
+}

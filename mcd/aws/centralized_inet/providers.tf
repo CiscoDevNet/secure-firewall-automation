@@ -41,25 +41,29 @@ provider "aws" {
 
 # Kubernetes Provider - This data is retreived from the EKS Cluster
 
-#provider "kubernetes" {
-#  host                   = aws_eks_cluster.eks-cluster.endpoint
-#  cluster_ca_certificate = base64decode(aws_eks_cluster.eks-cluster.certificate_authority[0].data)
-#  token                  = data.aws_eks_cluster_auth.eks_cluster_auth.token
-#  #config_path            = "~/.kube/config"
-#}
-#
-#provider "kubectl" {
-#  host                   = aws_eks_cluster.eks-cluster.endpoint
-#  cluster_ca_certificate = base64decode(aws_eks_cluster.eks-cluster.certificate_authority[0].data)
-#  token                  = data.aws_eks_cluster_auth.eks_cluster_auth.token
-#  #config_path             = "~/.kube/config"
-#}
-#
-#provider "helm" {
-#  kubernetes {
-#    host                   = aws_eks_cluster.eks-cluster.endpoint
-#    cluster_ca_certificate = base64decode(aws_eks_cluster.eks-cluster.certificate_authority[0].data)
-#    token                  = data.aws_eks_cluster_auth.eks_cluster_auth.token
-#    #config_path = "~/.kube/config"
-#  }
-#}
+data "aws_eks_cluster_auth" "eks_cluster_auth" {
+  name = "${var.env_name}-cluster"
+}
+
+provider "kubernetes" {
+  host                   = module.eks-cluster.eks-cluster-endpoint
+  cluster_ca_certificate = base64decode(module.eks-cluster.eks-cluster-certificate_authority)
+  token                  = data.aws_eks_cluster_auth.eks_cluster_auth.token
+  #config_path            = "~/.kube/config"
+}
+
+provider "kubectl" {
+  host                   = module.eks-cluster.eks-cluster-endpoint
+  cluster_ca_certificate = base64decode(module.eks-cluster.eks-cluster-certificate_authority)
+  token                  = data.aws_eks_cluster_auth.eks_cluster_auth.token
+  #config_path             = "~/.kube/config"
+}
+
+provider "helm" {
+  kubernetes {
+  host                   = module.eks-cluster.eks-cluster-endpoint
+  cluster_ca_certificate = base64decode(module.eks-cluster.eks-cluster-certificate_authority)
+  token                  = data.aws_eks_cluster_auth.eks_cluster_auth.token
+    #config_path = "~/.kube/config"
+  }
+}

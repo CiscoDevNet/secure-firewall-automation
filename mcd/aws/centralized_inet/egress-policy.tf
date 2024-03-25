@@ -15,16 +15,21 @@ data "ciscomcd_service_object" "forwarding_tcp_any" {
   name = "valtix-sample-egress-forwarding-snat"
 }
 
+#data "aws_lb" "eks-alb" {
+#  #depends_on = [module.sock-shop]
+#  name = "eks-alb-ingress"
+#}
+
 ## Address Objects
 
-## EKS ALB - Mapped to EKS ALB Public DNS
-#resource "ciscomcd_address_object" "eks-alb" {
-#	name = "eks-alb"
-#	description = "Mapped to EKS-ALB Public DNS Name"
-#	type = "STATIC"
-#	value = [data.aws_lb.eks-alb.dns_name]
-#	backend_address = true
-#}
+# EKS ALB - Mapped to EKS ALB Public DNS
+resource "ciscomcd_address_object" "eks-alb" {
+	name = "eks-alb"
+	description = "Mapped to EKS-ALB Public DNS Name"
+	type = "STATIC"
+	value = null #[data.aws_lb.eks-alb.dns_name]
+	backend_address = true
+}
 
 # Yelb Address - Mapped to Yelb NLB DNS Name
 resource "ciscomcd_address_object" "yelb-app" {
@@ -53,20 +58,20 @@ resource "ciscomcd_service_object" "yelb-app" {
 		}
 }
 
-## EKS ALB Service Object
-#resource "ciscomcd_service_object" "eks-alb" {
-#	name = "eks-alb"
-#	description = "EKS ALB Service Port"
-#	service_type = "ReverseProxy"
-#	protocol = "TCP"
-#	source_nat = false
-#	backend_address_group = ciscomcd_address_object.eks-alb.id
-#	transport_mode = "HTTP"
-#		port {
-#			destination_ports = "80"
-#			backend_ports = "80"
-#		}
-#}
+# EKS ALB Service Object
+resource "ciscomcd_service_object" "eks-alb" {
+	name = "eks-alb"
+	description = "EKS ALB Service Port"
+	service_type = "ReverseProxy"
+	protocol = "TCP"
+	source_nat = false
+	backend_address_group = ciscomcd_address_object.eks-alb.id
+	transport_mode = "HTTP"
+		port {
+			destination_ports = "80"
+			backend_ports = "80"
+		}
+}
 
 ###############################
 # Ingress Rules
@@ -85,17 +90,17 @@ resource "ciscomcd_policy_rules" "ingress_rules" {
 		send_deny_reset = false
 		type = "ReverseProxy"
 	}
-#	rule {
-#		name = "eks-alb"
-#		description = "Inbound Access to EKS ALB"
-#		action = "Allow Log"
-#		state = "ENABLED"
-#		service = ciscomcd_service_object.eks-alb.id
-#		source = data.ciscomcd_address_object.any_ag.id
-#		packet_capture_enabled = false
-#		send_deny_reset = false
-#		type = "ReverseProxy"
-#	}
+	rule {
+		name = "eks-alb"
+		description = "Inbound Access to EKS ALB"
+		action = "Allow Log"
+		state = "ENABLED"
+		service = ciscomcd_service_object.eks-alb.id
+		source = data.ciscomcd_address_object.any_ag.id
+		packet_capture_enabled = false
+		send_deny_reset = false
+		type = "ReverseProxy"
+	}
 }
 
 
