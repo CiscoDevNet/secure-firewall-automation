@@ -236,7 +236,13 @@ module "lb_role" {
  }
  }
 
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [aws_eks_node_group.private-nodes]
+  create_duration = "30s"
+}
+
 resource "kubernetes_service_account" "service-account" {
+  depends_on = [time_sleep.wait_30_seconds]
  metadata {
      name      = "aws-load-balancer-controller"
      namespace = "kube-system"

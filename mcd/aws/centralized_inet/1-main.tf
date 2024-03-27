@@ -141,7 +141,7 @@ module "yelb-app" {
   aws_availability_zones = var.aws_availability_zones
   instance_image         = "DockerCompose-Ubuntu-*"
   instance_type          = "t2.medium"
-  ssh_key_pair           = var.ssh_key_pair
+  ssh_key_pair           = aws_key_pair.public_key.key_name
   user_data              = <<-EOT
   #!/bin/bash
   git clone https://github.com/emcnicholas/demo-kind-yelb.git
@@ -169,12 +169,4 @@ module "eks-cluster" {
   spoke_vpc_id = module.eks-vpc.spoke_vpc_id
 }
 
-####################################################
-# Create Sock Shop Microservices App on EKS Cluster
-####################################################
 
-#module "sock-shop" {
-#  depends_on = [module.eks-cluster]
-#  source = "./modules/eks-app"
-#  spoke_subnets = module.eks-vpc.spoke_subnets
-#}

@@ -55,9 +55,9 @@ variable "gateway_image" {
   default = "23.08-14"
 }
 
-variable "ssh_key_pair" {
-  type = string
-}
+#variable "ssh_key_pair" {
+#  type = string
+#}
 
 variable "flow_log_s3_arn" {
   description = "S3 Bucket ARN to store VPC Flow Logs"
