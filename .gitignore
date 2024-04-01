@@ -35,3 +35,10 @@ mcd/aws/centralized_inet/.terraform/providers/registry.terraform.io/hashicorp/ti
 mcd/aws/centralized_inet/method-man-private-key.pem
 mcd/aws/distributed_edge/terraform.tfvars
 mcd/aws/distributed_edge/valtix_api_key_file.json
+mcd/aws/distributed_edge/.terraform.lock.hcl
+mcd/aws/distributed_edge/.terraform/providers/registry.terraform.io/ciscodevnet/ciscomcd/0.2.4/darwin_amd64/terraform-provider-ciscomcd_v0.2.4
+mcd/aws/distributed_edge/.terraform/providers/registry.terraform.io/hashicorp/aws/5.43.0/darwin_amd64/terraform-provider-aws_v5.43.0_x5
+mcd/aws/distributed_edge/.terraform/providers/registry.terraform.io/hashicorp/local/2.5.1/darwin_amd64/terraform-provider-local_v2.5.1_x5
+mcd/aws/distributed_edge/.terraform/providers/registry.terraform.io/hashicorp/random/3.6.0/darwin_amd64/terraform-provider-random_v3.6.0_x5
+mcd/aws/distributed_edge/.terraform/providers/registry.terraform.io/hashicorp/tls/4.0.5/darwin_amd64/terraform-provider-tls_v4.0.5_x5
+mcd/aws/distributed_edge/tfplan

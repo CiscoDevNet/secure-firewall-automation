@@ -184,14 +184,13 @@ resource "ciscomcd_gateway" "egress_gw" {
   datapath_security_group = aws_security_group.data-sg.id
   aws_gateway_lb          = true
   instance_details {
-    count = length(var.aws_availability_zones)
-    availability_zone = var.aws_availability_zones[count.index]
-    mgmt_subnet       = aws_subnet.edge_mgmt_subnet[count.index].id
-    datapath_subnet   = aws_subnet.edge_public_subnet[count.index].id
+    availability_zone = var.aws_availability_zones[0]
+    mgmt_subnet       = aws_subnet.edge_mgmt_subnet[0].id
+    datapath_subnet   = aws_subnet.edge_public_subnet[0].id
   }
-#  instance_details {
-#    availability_zone = var
-#    mgmt_subnet       = "subnet-123456788"
-#    datapath_subnet   = "subnet-123456789"
-#  }
+  instance_details {
+    availability_zone = var.aws_availability_zones[1]
+    mgmt_subnet       = aws_subnet.edge_mgmt_subnet[1].id
+    datapath_subnet   = aws_subnet.edge_public_subnet[1].id
+  }
 }
