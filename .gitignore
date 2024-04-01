@@ -33,3 +33,5 @@ mcd/aws/centralized_inet/terraform.tfstate.1711208979.backup
 mcd/aws/centralized_inet/terraform.tfstate.1711229693.backup
 mcd/aws/centralized_inet/.terraform/providers/registry.terraform.io/hashicorp/time/0.11.1/darwin_amd64/terraform-provider-time_v0.11.1_x5
 mcd/aws/centralized_inet/method-man-private-key.pem
+mcd/aws/distributed_edge/terraform.tfvars
+mcd/aws/distributed_edge/valtix_api_key_file.json

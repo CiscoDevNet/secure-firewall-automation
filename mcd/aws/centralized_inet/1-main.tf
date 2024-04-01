@@ -169,4 +169,20 @@ module "eks-cluster" {
   spoke_vpc_id = module.eks-vpc.spoke_vpc_id
 }
 
+# Create output file
+
+resource "local_file" "lab_info" {
+  depends_on = []
+    content     = <<-EOT
+    Run this command to add Kubeconfig to local .kube/config to acces the EKS Cluster:
+    aws eks update-kubeconfig --region ${var.aws_region} --name ${var.env_name}-cluster
+
+    Use these subnet names for the Sock-Shop Ingress alb.ingress.kubernetes.io/subnets
+    annotation located at the bottom of the sock-shop.yaml file:
+    ${var.env_name}-subnet-1 ${var.env_name}-subnet-2
+    EOT
+
+    filename = "${path.module}/lab_info.txt"
+}
+
 
