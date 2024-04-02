@@ -42,3 +42,6 @@ mcd/aws/distributed_edge/.terraform/providers/registry.terraform.io/hashicorp/lo
 mcd/aws/distributed_edge/.terraform/providers/registry.terraform.io/hashicorp/random/3.6.0/darwin_amd64/terraform-provider-random_v3.6.0_x5
 mcd/aws/distributed_edge/.terraform/providers/registry.terraform.io/hashicorp/tls/4.0.5/darwin_amd64/terraform-provider-tls_v4.0.5_x5
 mcd/aws/distributed_edge/tfplan
+mcd/aws/distributed_edge/mike_d-private-key.pem
+mcd/aws/distributed_edge/terraform.tfstate
+mcd/aws/distributed_edge/terraform.tfstate.backup

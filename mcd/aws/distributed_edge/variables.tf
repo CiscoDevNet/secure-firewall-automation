@@ -68,4 +68,5 @@ variable "external_ips" {
   description = "IP Addresses for which a Port 22 is opened in the Security Group. By default the current machines IP is added. These are the additional addresses"
   default     = []
   type        = list(string)
+
 }
