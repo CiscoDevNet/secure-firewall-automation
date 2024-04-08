@@ -47,3 +47,11 @@ mcd/aws/distributed_edge/terraform.tfstate
 mcd/aws/distributed_edge/terraform.tfstate.backup
 mcd/aws/dist_ingress-cent_egress/terraform.tfvars
 mcd/aws/dist_ingress-cent_egress/valtix_api_key_file.json
+mcd/aws/dist_ingress-cent_egress/.terraform.lock.hcl
+mcd/aws/dist_ingress-cent_egress/.terraform/modules/modules.json
+mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/ciscodevnet/ciscomcd/0.2.4/darwin_amd64/terraform-provider-ciscomcd_v0.2.4
+mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/hashicorp/aws/5.44.0/darwin_amd64/terraform-provider-aws_v5.44.0_x5
+mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/hashicorp/local/2.5.1/darwin_amd64/terraform-provider-local_v2.5.1_x5
+mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/hashicorp/random/3.6.0/darwin_amd64/terraform-provider-random_v3.6.0_x5
+mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/hashicorp/tls/4.0.5/darwin_amd64/terraform-provider-tls_v4.0.5_x5
+mcd/aws/dist_ingress-cent_egress/tfplan
