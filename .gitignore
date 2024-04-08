@@ -45,3 +45,5 @@ mcd/aws/distributed_edge/tfplan
 mcd/aws/distributed_edge/mike_d-private-key.pem
 mcd/aws/distributed_edge/terraform.tfstate
 mcd/aws/distributed_edge/terraform.tfstate.backup
+mcd/aws/dist_ingress-cent_egress/terraform.tfvars
+mcd/aws/dist_ingress-cent_egress/valtix_api_key_file.json
