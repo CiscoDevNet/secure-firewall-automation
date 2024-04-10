@@ -69,3 +69,25 @@ module "egress-service-vpc" {
   aws_gateway_lb         = true # must be bool - true for egress - false for ingress
 }
 
+##############################################
+# Create a Spoke VPC for the Yelb Application
+##############################################
+
+module "yelb-vpc" {
+  depends_on             = [module.egress-service-vpc]
+  source                 = "./modules/spoke-vpc"
+  env_name               = var.env_name
+  app_name               = "yelb"
+  ciscomcd_account       = var.ciscomcd_account
+  vpc_cidr               = "10.1.0.0/16"
+  aws_availability_zones = var.aws_availability_zones
+  transit_gateway_id     = aws_ec2_transit_gateway.tgw.id
+  egress_service_vpc_id  = module.egress-service-vpc.service_vpc_id
+  ssh_key_pair           = aws_key_pair.public_key.key_name # key created above in resource "aws_key_pair" "public_key"
+  app_service_port       = "8080"
+  aws_iam_role           = var.aws_iam_role
+  aws_region             = var.aws_region
+  external_ips           = var.external_ips
+  gateway_instance_type  = var.gateway_instance_type # size of instance ex: "AWS_M5_LARGE"
+  gateway_image          = var.gateway_image # gateway image version ex: "23.08-14"
+}

@@ -55,3 +55,5 @@ mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/hash
 mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/hashicorp/random/3.6.0/darwin_amd64/terraform-provider-random_v3.6.0_x5
 mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/hashicorp/tls/4.0.5/darwin_amd64/terraform-provider-tls_v4.0.5_x5
 mcd/aws/dist_ingress-cent_egress/tfplan
+mcd/aws/dist_ingress-cent_egress/terraform.tfstate
+mcd/aws/dist_ingress-cent_egress/terraform.tfstate.backup
