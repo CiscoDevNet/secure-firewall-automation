@@ -1,5 +1,9 @@
 # Cisco Multicloud Defense Ingress Gateway
 
+resource "ciscomcd_policy_rule_set" "ingress_policy" {
+  name = "${var.env_name}-ingress-policy-ruleset"
+}
+
 ## Deploys Ingress Gateways and Network Load Balancer in Public Subnets.
 ## Used to inspect inbound traffic to the applications.
 resource "ciscomcd_gateway" "ingress-gw" {

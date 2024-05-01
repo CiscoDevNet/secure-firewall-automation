@@ -15,11 +15,7 @@ data "ciscomcd_service_object" "forwarding_tcp_any" {
   name = "valtix-sample-egress-forwarding-snat"
 }
 
-# Policy Rule Set
 
-resource "ciscomcd_policy_rule_set" "egress_policy" {
-  name = "${var.env_name}-egress-policy-ruleset"
-}
 ########################
 # Egress Policy Rules
 ########################

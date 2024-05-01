@@ -57,3 +57,4 @@ mcd/aws/dist_ingress-cent_egress/.terraform/providers/registry.terraform.io/hash
 mcd/aws/dist_ingress-cent_egress/tfplan
 mcd/aws/dist_ingress-cent_egress/terraform.tfstate
 mcd/aws/dist_ingress-cent_egress/terraform.tfstate.backup
+mcd/aws/distributed_edge/paul-mccartney-private-key.pem

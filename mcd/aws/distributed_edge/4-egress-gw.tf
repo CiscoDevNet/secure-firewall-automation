@@ -1,5 +1,11 @@
 # Cisco Multicloud Defense Egress Gateway
 
+# Policy Rule Set
+
+resource "ciscomcd_policy_rule_set" "egress_policy" {
+  name = "${var.env_name}-egress-policy-ruleset"
+}
+
 ## Deploys Egress Gateways and AWS Gateway Load Balancers in Public Subnets.
 ## Used to inspect outbound traffic to the internet
 resource "ciscomcd_gateway" "egress_gw" {
