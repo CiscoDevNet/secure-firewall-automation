@@ -58,3 +58,8 @@ mcd/aws/dist_ingress-cent_egress/tfplan
 mcd/aws/dist_ingress-cent_egress/terraform.tfstate
 mcd/aws/dist_ingress-cent_egress/terraform.tfstate.backup
 mcd/aws/distributed_edge/paul-mccartney-private-key.pem
+aws/gwlb-v2/.terraform.lock.hcl
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/hashicorp/aws/5.48.0/darwin_amd64/terraform-provider-aws_v5.48.0_x5
+aws/gwlb-v2/terraform.tfstate
+aws/gwlb-v2/terraform.tfvars
+aws/gwlb-v2/tfplan
