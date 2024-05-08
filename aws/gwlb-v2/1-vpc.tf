@@ -38,6 +38,13 @@ resource "aws_subnet" "ccl_subnet" {
     Name = "${var.env_name} Service CCL Subnet"
   }
 }
+# Service Mgmt IGW
+resource "aws_internet_gateway" "mgmt_igw" {
+  vpc_id = aws_vpc.srvc_vpc.id
+  tags = {
+    Name = "${var.env_name} Service Mgmt-IGW"
+  }
+}
 
 # App VPC
 resource "aws_vpc" "app_vpc" {
@@ -64,5 +71,12 @@ resource "aws_subnet" "app_subnet" {
   availability_zone = var.aws_az
   tags = {
     Name = "${var.env_name } App Subnet"
+  }
+}
+# App IGW
+resource "aws_internet_gateway" "app_igw" {
+  vpc_id = aws_vpc.app_vpc.id
+  tags = {
+    Name = "${var.env_name } IGW"
   }
 }

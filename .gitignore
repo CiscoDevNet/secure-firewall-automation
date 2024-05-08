@@ -63,3 +63,13 @@ aws/gwlb-v2/.terraform/providers/registry.terraform.io/hashicorp/aws/5.48.0/darw
 aws/gwlb-v2/terraform.tfstate
 aws/gwlb-v2/terraform.tfvars
 aws/gwlb-v2/tfplan
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/ciscodevnet/cdo/1.3.1/darwin_amd64/CHANGELOG.md
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/ciscodevnet/cdo/1.3.1/darwin_amd64/LICENSE
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/ciscodevnet/cdo/1.3.1/darwin_amd64/README.md
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/ciscodevnet/cdo/1.3.1/darwin_amd64/terraform-provider-cdo_v1.3.1
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/ciscodevnet/fmc/1.4.8/darwin_amd64/CHANGELOG.md
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/ciscodevnet/fmc/1.4.8/darwin_amd64/LICENSE
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/ciscodevnet/fmc/1.4.8/darwin_amd64/README.md
+aws/gwlb-v2/.terraform/providers/registry.terraform.io/ciscodevnet/fmc/1.4.8/darwin_amd64/terraform-provider-fmc_v1.4.8
+aws/gwlb-v2/terraform.tfstate.backup
+aws/gwlb-v2/terraform.tfstate.backup
