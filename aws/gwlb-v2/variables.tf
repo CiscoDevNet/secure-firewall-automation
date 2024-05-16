@@ -111,7 +111,7 @@ variable "cdFMC" {
 # Firepower Threat Defense
 variable "ftd_version" {
   type        = string
-  default     = "ftdv-7.2*"
+  default     = "ftdv-7.3*"
 }
 variable "ftd_pass" {
   type        = string

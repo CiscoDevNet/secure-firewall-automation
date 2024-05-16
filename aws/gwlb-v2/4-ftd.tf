@@ -8,6 +8,7 @@
 data "aws_ami" "ftdv" {
   most_recent = true
   owners      = ["679593333241"]
+  include_deprecated = true
   filter {
     name   = "name"
     values = [var.ftd_version]
@@ -73,7 +74,7 @@ resource "cdo_ftd_device" "ftd" {
   licenses           = ["BASE","MALWARE","URLFilter","THREAT"]
   name               = "${var.env_name}-FTD"
   virtual            = true
-  performance_tier   = "FTDv20"
+  performance_tier   = "FTDv30"
 }
 
 # FTD Firewalls
@@ -84,29 +85,28 @@ resource "aws_instance" "ftd" {
   user_data_replace_on_change = true
   user_data                   = <<-EOT
   {
-   "EULA": "accept",
-   "AdminPassword":"${var.ftd_pass}",
-   "Hostname":"${var.env_name}-FTD",
-   "ManageLocally":"No",
-   "FmcIp":"${var.cdFMC}",
-   "FmcRegKey":"${cdo_ftd_device.ftd.reg_key}",
-   "FmcNatId":"${cdo_ftd_device.ftd.nat_id}",
-   "run_config": [
-      "interface TenGigabitEthernet0/0",
-         "nameif geneve-vtep-ifc",
-         "ip address dhcp",
-         "no shutdown",
-      "interface vni2",
-         "proxy single-arm",
-         "nameif ge",
-         "vtep-nve 2",
-      "nve 2",
-         "encapsulation geneve",
-         "source-interface geneve-vtep-ifc",
-      "jumbo-frame reservation",
-      "mtu geneve-vtep-ifc 1806",
-      "aaa authentication listener http geneve-vtep-ifc port 7777"
-      ]
+     "AdminPassword":"${var.ftd_pass}",
+     "Hostname":"${var.env_name}-FTDv",
+     "ManageLocally":"No",
+     "FmcIp":"${var.cdFMC}",
+     "FmcRegKey":"${cdo_ftd_device.ftd.reg_key}",
+     "FmcNatId":"${cdo_ftd_device.ftd.nat_id}",
+     "run_config": [
+        "interface TenGigabitEthernet0/0",
+           "nameif geneve-vtep-ifc",
+           "ip address dhcp",
+           "no shutdown",
+        "nve 1",
+           "encapsulation geneve",
+           "source-interface geneve-vtep-ifc",
+        "interface vni1",
+           "proxy single-arm",
+           "nameif vni1",
+           "vtep-nve 1",
+        "jumbo-frame reservation",
+        "mtu geneve-vtep-ifc 1806",
+        "aaa authentication listener http geneve-vtep-ifc port 7777"
+     ]
   }
   EOT
 
@@ -143,4 +143,9 @@ resource "aws_eip" "ftd-mgmt-EIP" {
 resource "aws_eip_association" "ftd-mgmt-ip-assocation" {
   network_interface_id = aws_network_interface.ftd_management.id
   allocation_id        = aws_eip.ftd-mgmt-EIP.id
+}
+
+resource "cdo_ftd_device_onboarding" "ftd" {
+  depends_on = [aws_eip_association.ftd-mgmt-ip-assocation, aws_instance.ftd]
+  ftd_uid    = cdo_ftd_device.ftd.id
 }

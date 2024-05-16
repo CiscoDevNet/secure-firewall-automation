@@ -46,37 +46,24 @@ resource "aws_internet_gateway" "mgmt_igw" {
   }
 }
 
-# App VPC
-resource "aws_vpc" "app_vpc" {
-  cidr_block           = var.app_cidr
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-  instance_tenancy     = "default"
+# Mgmt Route Table
+resource "aws_route_table" "mgmt_route_table" {
+  vpc_id = aws_vpc.srvc_vpc.id
   tags = {
-    Name = "${var.env_name }-App-VPC"
+    Name = "${var.env_name} Service Mgmt Route Table"
   }
 }
-# App Subnets
-resource "aws_subnet" "gwlbe_subnet" {
-  vpc_id            = aws_vpc.app_vpc.id
-  cidr_block        = var.gwlbe_subnet
-  availability_zone = var.aws_az
-  tags = {
-    Name = "${var.env_name } GWLBe Subnet"
-  }
+
+# Mgmt Default Route Routes
+resource "aws_route" "mgmt_default_route" {
+  depends_on = [aws_internet_gateway.mgmt_igw]
+  route_table_id         = aws_route_table.mgmt_route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.mgmt_igw.id
 }
-resource "aws_subnet" "app_subnet" {
-  vpc_id            = aws_vpc.app_vpc.id
-  cidr_block        = var.app_subnet
-  availability_zone = var.aws_az
-  tags = {
-    Name = "${var.env_name } App Subnet"
-  }
-}
-# App IGW
-resource "aws_internet_gateway" "app_igw" {
-  vpc_id = aws_vpc.app_vpc.id
-  tags = {
-    Name = "${var.env_name } IGW"
-  }
+
+# Mgmt Route Associations
+resource "aws_route_table_association" "mgmt_association" {
+  subnet_id      = aws_subnet.mgmt_subnet.id
+  route_table_id = aws_route_table.mgmt_route_table.id
 }
