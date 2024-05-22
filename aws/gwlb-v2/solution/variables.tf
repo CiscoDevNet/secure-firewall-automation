@@ -60,6 +60,7 @@ variable "app_server" {
   default = "10.1.1.100"
 }
 
+
 # Firepower Threat Defense
 variable "ftd_version" {
   type        = string
