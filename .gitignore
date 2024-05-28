@@ -99,3 +99,9 @@ aws/gwlb-v2/terraform.tfstate.1716312607.backup
 aws/gwlb-v2/terraform.tfstate.1716380095.backup
 aws/gwlb-v2/terraform.tfstate.1716380117.backup
 aws/gwlb-v2/terraform.tfstate.backup
+aws/gwlb-v2/gwlb-test6-private-key.pem
+aws/gwlb-v2/locals.tf
+aws/gwlb-v2/terraform.tfstate.backup
+aws/gwlb-v2/terraform.tfstate.1716900975.backup
+aws/gwlb-v2/terraform.tfstate.1716901003.backup
+aws/gwlb-v2/terraform.tfstate.backup
