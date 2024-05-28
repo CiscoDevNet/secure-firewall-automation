@@ -19,6 +19,7 @@ data "aws_ami" "ami_docker" {
 # EC2 Instances
 
 resource "aws_instance" "app" {
+  depends_on = [ciscomcd_policy_rules.egress-policy-rules]
   count         = length(var.aws_availability_zones)
   ami           = data.aws_ami.ami_docker.id
   instance_type = "t2.medium"
@@ -29,7 +30,7 @@ resource "aws_instance" "app" {
   ]
   user_data      = <<-EOT
   #!/bin/bash
-  echo "Cloning Yelb App"
+  #echo "Cloning Yelb App"
   git clone https://github.com/emcnicholas/demo-kind-yelb.git
   cd demo-kind-yelb/
   sudo docker compose up -d
