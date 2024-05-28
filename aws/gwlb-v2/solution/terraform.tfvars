@@ -14,10 +14,10 @@ region = "us-east-1"
 aws_az = "us-east-1a"
 
 # Cisco Secure Firewall
-ftd_pass             = "123Cisco@123!"
+ftd_pass             = ""
 ftd_performance_tier = "FTDv30"
 fmc_host             = ""
 fmc_reg_key          = ""
 fmc_nat_id           = ""
-fmc_user             = "api-admin"
+fmc_user             = ""
 fmc_pass             = ""
