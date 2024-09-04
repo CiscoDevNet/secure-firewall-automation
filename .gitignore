@@ -105,3 +105,6 @@ aws/gwlb-v2/terraform.tfstate.backup
 aws/gwlb-v2/terraform.tfstate.1716900975.backup
 aws/gwlb-v2/terraform.tfstate.1716901003.backup
 aws/gwlb-v2/terraform.tfstate.backup
+mcd/aws/dist_ingress-cent_egress/valtix_api_key_file.base64
+mcd/aws/dist_ingress-cent_egress/valtix_api_key_file.json.base64
+mcd/aws/dist_ingress-cent_egress/valtix_api_key_file222.json
